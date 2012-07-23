@@ -1,0 +1,36 @@
+User
+    ident Text
+    userName Text
+    accessToken Text
+    accessTokenSecret Text
+    asanaApiKey Text Maybe
+    UniqueUser ident
+    deriving Show
+
+Task
+    ident Text
+    externalId Text Maybe
+    name Text
+    dueOn Day Maybe
+    UniqueTask ident
+    deriving Show
+
+Pomodoro
+    ident Text
+    startOn Day
+    startAt UTCTime
+    endAt UTCTime
+    taskId Text
+    taskStatus Text
+    UniquePomodoro ident
+    deriving Show
+
+Break
+    ident Text
+    startOn Day
+    startAt UTCTime
+    endAt UTCTime
+    UniqueBreak ident
+    deriving Show
+
+ -- By default this file is used in Model.hs (which is imported by Foundation.hs)

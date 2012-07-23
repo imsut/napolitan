@@ -1,0 +1,10 @@
+<section>
+  <div class="page-header">
+    <h1>Settings
+
+  <div class="row">
+    <form class="well form-vertical span10 offset1" method="POST" action=@{SettingsR} enctype=#{enctype}>
+      <fieldset>
+        ^{widget}
+        <span class="help-block">Paste your Asana API Key here. The key can be found <a href="http://app.asana.com/-/account_api" target="_other">here</a>.
+        <input type="submit" class="btn" value="Submit">

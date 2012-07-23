@@ -1,0 +1,10 @@
+\<!-- Masthead
+\================================================== -->
+<header class="jumbotron subhead" id="overview">
+  <h1>Napolitan
+  <p class="lead">Asana + Pomodoro = delicious task management tool.
+
+<section>
+  <div class="row">
+    <div class="span4 offset4">
+      <a href=@{AuthR OA.twitterUrl} class="btn btn-primary btn-large span4">Sign in with Twitter

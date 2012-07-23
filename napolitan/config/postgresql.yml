@@ -1,0 +1,24 @@
+Default: &defaults
+  user: napolitan
+  password: napolitan
+  host: localhost
+  port: 5432
+  database: napolitan
+  poolsize: 10
+
+Development:
+  <<: *defaults
+
+Testing:
+  database: napolitan_test
+  <<: *defaults
+
+Staging:
+  database: napolitan_staging
+  poolsize: 100
+  <<: *defaults
+
+Production:
+  database: napolitan_production
+  poolsize: 100
+  <<: *defaults
