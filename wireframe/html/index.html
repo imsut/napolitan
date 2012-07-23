@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>ポモドーロ - Napolitan</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+
+  <!-- Le styles -->
+  <link href="css/bootstrap.css" rel="stylesheet">
+  <link href="css/bootstrap-responsive.css" rel="stylesheet">
+  <link href="css/datepicker.css" rel="stylesheet">
+  <link href="css/docs.css" rel="stylesheet">
+
+  <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+  <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+
+<body>
+
+<!-- Navbar
+================================================== -->
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container">
+      <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="brand" href="/">Napolitan</a>
+      <div class="nav-collapse collapse">
+        <ul class="nav">
+          <li class="active">
+            <a href="#">Pomodoro</a>
+          </li>
+          <li class="">
+            <a href="#">Stats</a>
+          </li>
+          <li class="divider-vertical"></li>
+          <li class="">
+            <a href="#">Settings</a>
+          </li>
+          <li class="">
+            <a href="#">Sign out</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+<section>
+<div class="page-header">
+  <h1>Pomodoro</h1>
+</div>
+
+<div class="row">
+  <div class="span2 offset2">
+    <a class="btn btn-danger btn-large span2" data-toggle="modal" href="#modal-pomodoro" data-backdrop="static" onclick="Napolitan.startPomodoro()">Pomodoro</a>
+  </div>
+  <div class="span2 offset1">
+    <a class="btn btn-info btn-large span2" data-toggle="modal" href="#modal-break" data-backdrop="static">Short Break</a>
+  </div>
+  <div class="span2 offset1">
+    <a class="btn btn-success btn-large span2" data-toggle="modal" href="#modal-break" data-backdrop="static">Long Break</a>
+  </div>
+</div><!-- .row -->
+
+<div class="modal hide" id="modal-pomodoro">
+  <div class="modal-header">
+    <h3>Running Pomodoro...</h3>
+  </div>
+  <div class="modal-body">
+    <p id="pomodoro-timer">25:00</p>
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn btn-danger pull-left" data-dismiss="modal">Abort Pomodoro</a>
+    <a href="#" class="btn btn-primary">Task Finished</a>
+  </div>
+</div>
+
+<div class="modal hide" id="modal-break">
+  <div class="modal-header">
+    <h3>Break time...</h3>
+  </div>
+  <div class="modal-body">
+    <p id="break-timer">5:00</p>
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn btn-danger" data-dismiss="modal">Cut off Break</a>
+  </div>
+</div>
+
+</section>
+
+<section>
+<div class="page-header">
+  <h1>Today's Tasks</h1>
+</div>
+
+<div class="row">
+  <table id="tasks" class="table table-striped span8 offset2">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Task</th>
+        <th>Due Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><i class="icon-resize-vertical"></i></td>
+        <td>Develop "Hello World"</td>
+        <td>2012-7-20</td>
+      </tr>
+      <tr>
+        <td><i class="icon-resize-vertical"></i></td>
+        <td>Test "Hello World"</td>
+        <td>2012-7-21</td>
+      </tr>
+      <tr>
+        <td><i class="icon-resize-vertical"></i></td>
+        <td>Test "Hello World"</td>
+        <td>2012-7-21</td>
+      </tr>
+      <tr>
+        <td><i class="icon-resize-vertical"></i></td>
+        <td>Test "Hello World"</td>
+        <td>2012-7-21</td>
+      </tr>
+      <tr>
+        <td><i class="icon-resize-vertical"></i></td>
+        <td>Test "Hello World"</td>
+        <td>2012-7-21</td>
+      </tr>
+    </tbody>
+  </table>
+</div><!-- .row -->
+
+</section>
+
+<section>
+<div class="page-header">
+  <h1>Completed Tasks</h1>
+</div>
+
+<div class="row">
+  <table id="completed-tasks" class="table table-striped span8 offset2">
+    <thead>
+      <tr>
+        <th>Task</th>
+        <th>Due Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Develop "Hello World"</td>
+        <td>2012-7-20</td>
+      </tr>
+      <tr>
+        <td>Test "Hello World"</td>
+        <td>2012-7-21</td>
+      </tr>
+      <tr>
+        <td>Test "Hello World"</td>
+        <td>2012-7-21</td>
+      </tr>
+    </tbody>
+  </table>
+</div><!-- .row -->
+
+</section>
+
+<!-- Footer
+================================================== -->
+<footer class="footer">
+  <p class="pull-right"><a href="#">Back to top</a></p>
+  <p>Designed and built by <a href="http://twitter.com/imsuten" target="_blank">@imsuten</a>.</p>
+  <p>Code licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License v2.0</a>.</p>
+  <p>Icons from <a href="http://glyphicons.com">Glyphicons Free</a>, licensed under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+</footer>
+
+</div><!-- container -->
+
+<script src="js/jquery.js"></script>
+<script src="js/jquery-ui-1.8.21.custom.min.js"></script>
+<script src="js/bootstrap-alert.js"></script>
+<script src="js/bootstrap-modal.js"></script>
+<script type="text/javascript">
+  $("#tasks tbody").sortable({
+    handle: 'td:first'
+}).disableSelection();
+
+var Napolitan = {};
+Napolitan = {
+  _pomodoroSec: 25 * 60,
+  _shortBreakSec: 5 * 60,
+  _longBreakSec: 20 * 60,
+
+  startPomodoro: function() {
+    this.setTimer($('#pomodoro-timer'), this._pomodoroSec);
+  },
+
+  startBreak: function() {
+  },
+
+  Timer: function() {
+    
+  },
+
+  Timer.prototype =  {
+    setCallback: function(cycleInSec, callback) {
+    
+    }
+  },
+//  setTimer: function(timer, 
+}
+</script>
+<script>
+$.ready(function() {
+  $('#soundHandle').play();
+});
+</script>
+
+</body>
+</html>
