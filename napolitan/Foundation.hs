@@ -33,7 +33,7 @@ import qualified Yesod.Auth.OAuth as OA
 import Data.Maybe
 import Data.ByteString (ByteString)
 import Data.Text (Text)
-import Data.Text.Encoding (decodeUtf8With)
+import Data.Text.Encoding (decodeUtf8With, encodeUtf8)
 import Data.Text.Encoding.Error (lenientDecode)
 import Control.Arrow ((***))
 
@@ -157,10 +157,13 @@ instance YesodAuth App where
         Nothing -> do
           fmap Just $ insert $ User userId screenName oaToken oaTokenSecret Nothing
 
-    authPlugins _ = [authTwitter]
+    authPlugins m = [authTwitter
+                     ((encodeUtf8 . extraOauthKey . appExtra . settings) m)
+                     ((encodeUtf8 . extraOauthSecret . appExtra . settings) m)]
 
     authHttpManager = httpManager
 
+    -- override default behavior, setting login message
     onLogin = return ()
 
 -- This instance is required to use forms. You can modify renderMessage to
@@ -169,15 +172,15 @@ instance RenderMessage App FormMessage where
     renderMessage _ _ = defaultFormMessage
 
 -- Auth plugin for Twitter OAuth
-authTwitter :: YesodAuth m => AuthPlugin m
-authTwitter = OA.authOAuth
+authTwitter :: YesodAuth m => ByteString -> ByteString -> AuthPlugin m
+authTwitter key secret = OA.authOAuth
                 (OA.newOAuth { OA.oauthServerName      = "twitter"
                           , OA.oauthRequestUri      = "https://api.twitter.com/oauth/request_token"
                           , OA.oauthAccessTokenUri  = "https://api.twitter.com/oauth/access_token"
                           , OA.oauthAuthorizeUri    =  "https://api.twitter.com/oauth/authorize"
                           , OA.oauthSignatureMethod = OA.HMACSHA1
-                          , OA.oauthConsumerKey     = "TWdHy6oBrXJ5BkIFV49Q"
-                          , OA.oauthConsumerSecret  = "zJRTdVDNiRd1Bh0YmqJ0e55QWK5ZKKYy5RLbE1Lp3QU"
+                          , OA.oauthConsumerKey     = key
+                          , OA.oauthConsumerSecret  = secret
                           , OA.oauthVersion         = OA.OAuth10
                           })
                 extractCreds

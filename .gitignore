@@ -1,2 +1,4 @@
 napolitan/cabal-dev
 napolitan/dist
+napolitan/config/client_session_key.aes
+napolitan/config/settings.yml
