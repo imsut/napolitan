@@ -149,13 +149,18 @@ instance YesodAuth App where
       let userId = credsIdent creds
           extra = credsExtra creds
           screenName = fromJust $ lookup "screen_name" extra
-          oaToken = fromJust $ lookup "oauth_token" extra
-          oaTokenSecret = fromJust $ lookup "oauth_token_secret" extra
+          moaToken = lookup "oauth_token" extra
+          moaSecret = lookup "oauth_token_secret" extra
       x <- getBy $ UniqueUser userId
       case x of
-        Just (Entity uid _) -> return $ Just uid
+        Just (Entity uid (User _ _ mtoken msecret _)) ->
+          if mtoken == moaToken && msecret == moaSecret
+          then return $ Just uid
+          else do
+            update uid [UserOauthToken =. moaToken, UserOauthSecret =. moaSecret]
+            return $ Just uid
         Nothing -> do
-          fmap Just $ insert $ User userId screenName oaToken oaTokenSecret Nothing
+          fmap Just $ insert $ User userId screenName moaToken moaSecret Nothing
 
     authPlugins m = [authTwitter
                      ((encodeUtf8 . extraOauthKey . appExtra . settings) m)

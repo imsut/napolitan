@@ -35,7 +35,7 @@
                 <a href=@{SettingsR}>Settings
               <li class="">
                 $maybe _ <- mauth
-                  <a href=@{AuthR LogoutR}>Sign out
+                  <a href=@{SignoutR}>Sign out
                 $nothing
                   <a href=@{AuthR OA.twitterUrl}>Sign in
 

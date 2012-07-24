@@ -1,8 +1,8 @@
 User
     ident Text
     userName Text
-    accessToken Text
-    accessTokenSecret Text
+    oauthToken Text Maybe
+    oauthSecret Text Maybe
     asanaApiKey Text Maybe
     UniqueUser ident
     deriving Show

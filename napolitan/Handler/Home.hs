@@ -9,9 +9,11 @@ getHomeR :: Handler RepHtml
 getHomeR = do
   maid <- maybeAuthId
   case maid of
-    Just _ -> defaultLayout $ do
-      setTitle "Pomodoro - Napolitan"
-      $(widgetFile "pomodoro")
+    Just _ -> do
+      -- add something here
+      defaultLayout $ do
+        setTitle "Pomodoro - Napolitan"
+        $(widgetFile "pomodoro")
     Nothing -> defaultLayout $ do
       setTitle "Napolitan = Asana + Pomorodo"
       $(widgetFile "welcome")
@@ -22,8 +24,3 @@ getHomeR = do
     --     aDomId <- lift newIdent
     --     setTitle "Welcome To Yesod!"
     --     $(widgetFile "homepage")
-
--- sampleForm :: Form (FileInfo, Text)
--- sampleForm = renderDivs $ (,)
---     <$> fileAFormReq "Choose a file"
---     <*> areq textField "What's on the file?" Nothing

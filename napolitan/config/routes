@@ -9,3 +9,4 @@
 /settings    SettingsR GET POST
 
 /signup      SignupR GET
+/signout     SignoutR GET
