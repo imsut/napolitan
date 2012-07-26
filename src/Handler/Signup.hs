@@ -3,7 +3,7 @@ module Handler.Signup where
 
 import Import
 import qualified Yesod.Auth.OAuth as OA
-import Yesod.Logger
+--import Yesod.Logger
 import Yesod.Auth
 
 getSignupR :: Handler RepHtml

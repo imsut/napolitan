@@ -91,6 +91,22 @@ instance Yesod App where
         master <- getYesod
         mmsg <- getMessage
         mauth <- maybeAuth
+        msubRoute <- getCurrentRoute
+        routeToMaster <- getRouteToMaster
+
+        let mroute = fmap routeToMaster msubRoute
+            activePomodoro = case mroute of
+              Just HomeR -> "active" :: Text
+              _ -> ""
+            activeStats = case mroute of
+              Just (StatsR _) -> "active" :: Text
+              _ -> ""
+            activeSettings = case mroute of
+              Just SettingsR -> "active" :: Text
+              _ -> ""
+            muserName = case mauth of
+              Just (Entity _ (User _ name _ _ _)) -> Just name
+              Nothing -> Nothing
 
         -- We break up the default layout into two components:
         -- default-layout is the contents of the body tag, and

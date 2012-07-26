@@ -1,4 +1,4 @@
-\<!doctype html>
+$doctype 5
 <html lang="en">
   <head>
     <meta charset="UTF-8">
@@ -26,12 +26,15 @@
           <a class="brand" href="/">Napolitan
           <div class="nav-collapse collapse">
             <ul class="nav">
-              <li class="active">
+              <li class=#{activePomodoro}>
                 <a href=@{HomeR}>Pomodoro
-              <li class="">
-                <a href="#">Stats
+              <li class=#{activeStats}>
+                $maybe userName <- muserName
+                  <a href=@{StatsR userName}>Stats
+                $nothing
+                  <a href="#">Stats
               <li class="divider-vertical">
-              <li class="">
+              <li class=#{activeSettings}>
                 <a href=@{SettingsR}>Settings
               <li class="">
                 $maybe _ <- mauth

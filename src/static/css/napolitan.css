@@ -576,6 +576,14 @@ body section:first-child {
   letter-spacing: 5px;
 }
 
+#modal-sync div.modal-body {
+  text-align: center;
+}
+
+#modal-sync div.modal-body img {
+  padding: 10px 0;
+}
+
 
 /* Icons
 ------------------------- */

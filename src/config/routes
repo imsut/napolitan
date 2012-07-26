@@ -5,7 +5,7 @@
 /robots.txt  RobotsR GET
 
 /            HomeR GET
-/stats/#String StatsR GET
+/stats/#Text StatsR GET
 /settings    SettingsR GET POST
 
 /signup      SignupR GET

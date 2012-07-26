@@ -2,8 +2,9 @@
 module Handler.Settings where
 
 import Import
-import Yesod.Auth (maybeAuthId, maybeAuth)
-import Yesod.Logger
+import Yesod.Auth (maybeAuthId)
+--import Yesod.Auth (maybeAuthId, maybeAuth)
+--import Yesod.Logger
 
 getSettingsR :: Handler RepHtml
 getSettingsR = do

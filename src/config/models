@@ -1,6 +1,6 @@
 User
     ident Text
-    userName Text
+    name Text
     oauthToken Text Maybe
     oauthSecret Text Maybe
     asanaApiKey Text Maybe

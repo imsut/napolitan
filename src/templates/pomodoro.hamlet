@@ -32,6 +32,17 @@
     <h1>Today's Tasks
 
   <div class="row">
+    <p class="span2 offset8">
+      <a href="#modal-sync" data-toggle="modal" data-backdrop="static" class="pull-right">
+        <i class="icon-refresh">
+        \ Sync with Asana
+
+  <div class="modal hide" id="modal-sync">
+    <div class="modal-body">
+      <h3>Synchronizing tasks with Asana...
+      <p><img src="/static/img/ajax-loader.gif" title="synchronizing tasks..."/>
+
+  <div class="row">
     <table id="tasks" class="table table-striped span8 offset2">
       <thead>
         <tr>
