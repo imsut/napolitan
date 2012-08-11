@@ -12,7 +12,14 @@ $(function() {
   $("#fieldAsanaKey").blur(function(event) {
     var field = $("#fieldAsanaKey");
     var key = field.val();
-    $.getJSON('/proxy/asana/workspaces?key=' + key, function(data) {
+    $.getJSON('/proxy/asana/workspaces', { 'key': key }, function(data) {
+      $("#fieldAsanaWorkspaces option").remove();
+      $.each(data, function(wsName, wsId) {
+        var opt = $(document.createElement('option'));
+        opt.attr('value', wsId);
+        opt.text(wsName);
+        $("#fieldAsanaWorkspaces").append(opt);
+      });
     });
   });
 });

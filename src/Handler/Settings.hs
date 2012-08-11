@@ -22,13 +22,20 @@ data Settings = Settings
 settingsAForm :: Maybe Settings -> [AsanaWorkspace] -> AForm App App Settings
 settingsAForm mset wks = Settings
     <$> areq textField keySettings (settingsAsanaKey <$> mset)
-    <*> areq (multiSelectFieldList wklist) "Workspace" (settingsAsanaWsId <$> mset)
+    <*> areq (multiSelectFieldList wklist) wsSettings (settingsAsanaWsId <$> mset)
   where
     wklist = Import.map (\(AsanaWorkspace ident name) -> (name, ident)) wks
     keySettings = FieldSettings {
         fsLabel = fromString "Asana API Key"
       , fsTooltip = Nothing
       , fsId = Just "fieldAsanaKey"
+      , fsName = Nothing
+      , fsAttrs = []
+      }
+    wsSettings = FieldSettings {
+        fsLabel = fromString "Asana Workspace"
+      , fsTooltip = Nothing
+      , fsId = Just "fieldAsanaWorkspaces"
       , fsName = Nothing
       , fsAttrs = []
       }

@@ -17,8 +17,8 @@ getAsanaR :: Text -> Handler RepJson
 getAsanaR "workspaces" = do
     mkey <- lookupGetParam "key"
     case mkey of
-      Nothing -> do
-        repJson <- jsonToRepJson ()
-        sendResponseStatus badRequest400 repJson
+      Nothing -> jsonToRepJson () >>= sendResponseStatus badRequest400
+      Just "" -> jsonToRepJson () >>= sendResponseStatus badRequest400
       Just key -> do
-        jsonToRepJson $ M.fromList ([("foo", True), ("bar", False)] :: [(String, Bool)])
+        jsonToRepJson $ M.fromList ([("foo", 123), ("bar", 456)] :: [(String, Integer)])
+getAsanaR _ = jsonToRepJson () >>= sendResponseStatus notFound404
