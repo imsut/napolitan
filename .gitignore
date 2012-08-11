@@ -2,3 +2,4 @@ src/cabal-dev
 src/dist
 src/config/client_session_key.aes
 src/config/settings.yml
+src/static/tmp
