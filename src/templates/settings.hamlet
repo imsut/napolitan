@@ -6,5 +6,10 @@
     <form class="well form-vertical span10 offset1" method="POST" action=@{SettingsR} enctype=#{enctype}>
       <fieldset>
         ^{widget}
-        <span class="help-block">Paste your Asana API Key here. The key can be found <a href="http://app.asana.com/-/account_api" target="_other">here</a>.
+        <span class="help-block">Asana API Key can be found <a href="http://app.asana.com/-/account_api" target="_other">here</a>.
         <input type="submit" class="btn" value="Submit">
+
+  <div class="row">
+    <ul>
+      $forall AsanaWorkspace i t <- workspaces
+        <li>#{i}: #{t}

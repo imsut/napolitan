@@ -10,3 +10,7 @@
 
 /signup      SignupR GET
 /signout     SignoutR GET
+
+/sync/#Text  SyncR GET
+
+/proxy/asana/#Text AsanaR GET

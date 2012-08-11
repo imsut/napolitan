@@ -1,0 +1,19 @@
+// initialization
+$(function() {
+  $("#tasks tbody").sortable({
+    handle: 'td:first'
+  }).disableSelection();
+
+ var syncWithAsana = function() {
+    $.getJSON('/sync/asana', function(data) {
+    });
+  }
+
+  $("#fieldAsanaKey").blur(function(event) {
+    var field = $("#fieldAsanaKey");
+    var key = field.val();
+    $.getJSON('/proxy/asana/workspaces?key=' + key, function(data) {
+    });
+  });
+});
+

@@ -28,10 +28,14 @@ library
                      Settings
                      Settings.StaticFiles
                      Settings.Development
+                     Handler.Asana
                      Handler.Home
                      Handler.Stats
                      Handler.Signup
                      Handler.Settings
+                     Handler.Sync
+
+    other-modules: Model.Asana
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT
@@ -65,7 +69,7 @@ library
                  , bytestring                    >= 0.9        && < 0.10
                  , text                          >= 0.11       && < 0.12
                  , persistent                    >= 0.9        && < 0.10
-                 , persistent-postgresql     >= 0.9        && < 0.10
+                 , persistent-postgresql         >= 0.9        && < 0.10
                  , template-haskell
                  , hamlet                        >= 1.0        && < 1.1
                  , shakespeare-css               >= 1.0        && < 1.1
@@ -80,6 +84,10 @@ library
                  , warp                          >= 1.2        && < 1.3
                  , time
                  , yesod-auth-oauth
+                 , yesod-json
+                 , containers
+                 , aeson
+                 , http-types
 --                 , transformers                  >= 0.3
 --                 , authenticate-oauth            >= 1.3
 

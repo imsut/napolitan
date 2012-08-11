@@ -33,7 +33,7 @@
 
   <div class="row">
     <p class="span2 offset8">
-      <a href="#modal-sync" data-toggle="modal" data-backdrop="static" class="pull-right">
+      <a href="#modal-sync" data-toggle="modal" data-backdrop="static" class="pull-right" onclick="syncWithAsana()">
         <i class="icon-refresh">
         \ Sync with Asana
 

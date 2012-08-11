@@ -105,7 +105,7 @@ instance Yesod App where
               Just SettingsR -> "active" :: Text
               _ -> ""
             muserName = case mauth of
-              Just (Entity _ (User _ name _ _ _)) -> Just name
+              Just (Entity _ (User _ name _ _)) -> Just name
               Nothing -> Nothing
 
         -- We break up the default layout into two components:
@@ -118,6 +118,10 @@ instance Yesod App where
             addStylesheet $ StaticR css_bootstrap_css
             addStylesheet $ StaticR css_bootstrap_responsive_css
             addStylesheet $ StaticR css_napolitan_css
+            addScript $ StaticR js_jquery_js
+            addScript $ StaticR js_jquery_ui_1_8_21_custom_min_js
+            addScript $ StaticR js_bootstrap_alert_js
+            addScript $ StaticR js_bootstrap_modal_js
             $(widgetFile "default-layout")
         hamletToRepHtml $(hamletFile "templates/default-layout-wrapper.hamlet")
 
@@ -128,7 +132,7 @@ instance Yesod App where
     urlRenderOverride _ _ = Nothing
 
     -- The page to be redirected to when authentication is required.
-    authRoute _ = Just $ AuthR LoginR
+    authRoute _ = Just $ AuthR OA.twitterUrl
 
     messageLogger y loc level msg =
       formatLogText (getLogger y) loc level msg >>= logMsg (getLogger y)
@@ -141,6 +145,18 @@ instance Yesod App where
 
     -- Place Javascript at bottom of the body tag so the rest of the page loads first
     jsLoader _ = BottomOfBody
+
+    -- route name, then a boolean indicating if it's a write request
+    isAuthorized SettingsR _ = isSignedIn
+    isAuthorized (AsanaR _) _ = isSignedIn
+    isAuthorized _ _ = return Authorized
+
+isSignedIn :: GHandler s App AuthResult
+isSignedIn = do
+  maid <- maybeAuthId
+  return $ case maid of
+    Nothing -> AuthenticationRequired
+    Just _ -> Authorized
 
 -- How to run database actions.
 instance YesodPersist App where
@@ -169,14 +185,14 @@ instance YesodAuth App where
           moaSecret = lookup "oauth_token_secret" extra
       x <- getBy $ UniqueUser userId
       case x of
-        Just (Entity uid (User _ _ mtoken msecret _)) ->
+        Just (Entity uid (User _ _ mtoken msecret)) ->
           if mtoken == moaToken && msecret == moaSecret
           then return $ Just uid
           else do
             update uid [UserOauthToken =. moaToken, UserOauthSecret =. moaSecret]
             return $ Just uid
         Nothing -> do
-          fmap Just $ insert $ User userId screenName moaToken moaSecret Nothing
+          fmap Just $ insert $ User userId screenName moaToken moaSecret
 
     authPlugins m = [authTwitter
                      ((encodeUtf8 . extraOauthKey . appExtra . settings) m)
@@ -212,4 +228,3 @@ authTwitter key secret = OA.authOAuth
 
 bsToText :: ByteString -> Text
 bsToText = decodeUtf8With lenientDecode
-

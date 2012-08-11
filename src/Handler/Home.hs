@@ -13,11 +13,13 @@ getHomeR = do
       -- add something here
       defaultLayout $ do
         setTitle "Pomodoro - Napolitan"
+        $(widgetFile "pomodoro-js")
         $(widgetFile "pomodoro")
     Nothing -> defaultLayout $ do
       setTitle "Napolitan = Asana + Pomorodo"
       $(widgetFile "welcome")
-    -- (formWidget, formEnctype) <- generateFormPost sampleForm
+    
+-- (formWidget, formEnctype) <- generateFormPost sampleForm
     -- let submission = Nothing :: Maybe (FileInfo, Text)
     --     handlerName = "getHomeR" :: Text
     -- defaultLayout $ do

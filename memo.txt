@@ -1,0 +1,54 @@
+    req = applyBasicAuth (E.encodeUtf8 key) "" $ parseUrl $ unpack uriAsanaWorkspaces
+
+Handler/Settings.hs:43:50:
+    No instance for (failure-0.2.0.1:Control.Failure.Failure
+                       HttpException m0)
+      arising from a use of `parseUrl'
+    Possible fix:
+      add an instance declaration for
+      (failure-0.2.0.1:Control.Failure.Failure HttpException m0)
+    In the expression: parseUrl
+    In the second argument of `($)', namely
+      `parseUrl $ unpack uriAsanaWorkspaces'
+    In the expression:
+      applyBasicAuth (E.encodeUtf8 key) ""
+      $ parseUrl $ unpack uriAsanaWorkspaces
+
+Handler/Settings.hs:43:50:
+    Couldn't match kind `*' against `* -> *'
+    Kind incompatibility when matching types:
+      m0 :: * -> *
+      C.Request :: (* -> *) -> *
+    In the second argument of `($)', namely
+      `parseUrl $ unpack uriAsanaWorkspaces'
+    In the expression:
+      applyBasicAuth (E.encodeUtf8 key) ""
+      $ parseUrl $ unpack uriAsanaWorkspaces
+Build failure, pausing...
+
+
+
+
+[10 of 12] Compiling Handler.Settings ( Handler/Settings.hs, dist/build/Handler/Settings.o )
+
+Handler/Settings.hs:26:20:
+    Couldn't match expected type `Parser [AsanaWorkspace]'
+                with actual type `[Parser AsanaWorkspace]'
+    Expected type: [Object] -> Parser [AsanaWorkspace]
+      Actual type: [Object] -> [Parser AsanaWorkspace]
+    In the expression:
+      fmap $ \ x -> AsanaWorkspace <$> x .: "id" <*> x .: "name"
+    In an equation for parseJSON':
+        parseJSON'
+          = fmap $ \ x -> AsanaWorkspace <$> x .: "id" <*> x .: "name"
+
+
+-- {"data":[{"id":42742032946,"name":"RevenueEng"},{"id":723538443138,"name":"Family / Personal"}]}
+instance FromJSON [AsanaWorkspace] where
+  parseJSON (Object v) = do
+    list <- v .: "data"
+    parseJSON' list
+    where
+      parseJSON' :: [Object] -> Parser [AsanaWorkspace]
+      parseJSON' = fmap $ \x ->
+        AsanaWorkspace <$> x .: "id" <*> x .: "name"

@@ -3,18 +3,27 @@ module Handler.Signup where
 
 import Import
 import qualified Yesod.Auth.OAuth as OA
---import Yesod.Logger
+import Yesod.Logger
 import Yesod.Auth
 
 getSignupR :: Handler RepHtml
 getSignupR = do
-  mauth <- maybeAuth
-  case mauth of
-    Just (Entity _ (User _ _ _ _ Nothing)) ->
-      redirect SettingsR
-      --liftIO $ defaultDevelopmentLogger >>= flip logString (show u)
-    Just _ -> redirect HomeR -- already registered. go ahead
+  maid <- maybeAuthId
+  case maid of
     Nothing -> redirect $ AuthR OA.twitterUrl -- weird. try again
+    Just aid -> do
+      liftIO $ defaultDevelopmentLogger >>= flip logString (show maid)
+      mconfig <- runDB $ getBy $ UniqueConfigByUserId aid
+      case mconfig of
+        Just (Entity _ (AsanaConfig _ _ [])) -> redirect SettingsR -- workspace not set
+        Just _ -> redirect HomeR
+        Nothing -> redirect SettingsR -- record doesn't exist
+
+-- case mauth of
+  --   Just (Entity _ (User _ _ _ _ Nothing Nothing)) ->
+  --     redirect SettingsR
+  --   Just _ -> redirect HomeR -- already registered. go ahead
+  --   Nothing -> redirect $ AuthR OA.twitterUrl -- weird. try again
 
 getSignoutR :: Handler RepHtml
 getSignoutR = do

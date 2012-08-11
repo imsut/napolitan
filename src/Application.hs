@@ -19,10 +19,12 @@ import Network.HTTP.Conduit (newManager, def)
 
 -- Import all relevant handler modules here.
 -- Don't forget to add new modules to your cabal file!
+import Handler.Asana
 import Handler.Home
 import Handler.Stats
 import Handler.Signup
 import Handler.Settings
+import Handler.Sync
 
 -- This line actually creates our YesodSite instance. It is the second half
 -- of the call to mkYesodData which occurs in Foundation.hs. Please see
