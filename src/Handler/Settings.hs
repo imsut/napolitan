@@ -1,30 +1,27 @@
 {-# LANGUAGE TupleSections, OverloadedStrings, FlexibleInstances #-}
-module Handler.Settings where
+module Handler.Settings
+    ( getSettingsR
+    , postSettingsR
+    ) where
 
-import Data.Aeson
-import Data.Aeson.Types
-import qualified Data.Map as M
 import Data.Maybe
 import Data.String
 import Data.Text
-import qualified Data.Text.Encoding as E
+import DebugUtil
 import Import
-import Model.Asana
-import Network.HTTP.Conduit as C
+import qualified Model.Asana as A
 import Yesod.Auth (maybeAuthId)
 
-data Settings = Settings
-                { settingsAsanaKey :: Text
-                , settingsAsanaWsId :: [Int]
-                }
-                deriving Show
+data Settings = Settings { apiKey :: Text
+                         , wksIds :: [Int]
+                         } deriving Show
 
-settingsAForm :: Maybe Settings -> [AsanaWorkspace] -> AForm App App Settings
+settingsAForm :: Maybe Settings -> [A.AsanaWorkspace] -> AForm App App Settings
 settingsAForm mset wks = Settings
-    <$> areq textField keySettings (settingsAsanaKey <$> mset)
-    <*> areq (multiSelectFieldList wklist) wsSettings (settingsAsanaWsId <$> mset)
+    <$> areq textField keySettings (apiKey <$> mset)
+    <*> areq (multiSelectFieldList wklist) wsSettings (wksIds <$> mset)
   where
-    wklist = Import.map (\(AsanaWorkspace ident name) -> (name, ident)) wks
+    wklist = fmap (\(A.AsanaWorkspace ident name) -> (name, ident)) wks
     keySettings = FieldSettings {
         fsLabel = fromString "Asana API Key"
       , fsTooltip = Nothing
@@ -40,14 +37,11 @@ settingsAForm mset wks = Settings
       , fsAttrs = []
       }
 
-settingsForm :: Maybe AsanaConfig -> [AsanaWorkspace] -> Html
+settingsForm :: Maybe AsanaConfig -> [A.AsanaWorkspace] -> Html
                 -> MForm App App (FormResult Settings, Widget)
 settingsForm Nothing wks = renderTable $ settingsAForm Nothing wks
 settingsForm (Just (AsanaConfig _ key selected)) wks =
   renderTable $ settingsAForm (Just (Settings key selected)) wks
-
---asanaKeyForm :: Maybe Text -> Form Text
---asanaKeyForm key = renderDivs $ areq textField "Asana API Key" key
 
 getSettingsR :: Handler RepHtml
 getSettingsR = do
@@ -56,32 +50,21 @@ getSettingsR = do
     let mconfig = entityVal <$> mrec
     workspaces <- case mconfig of
       Nothing -> return []
-      Just config -> liftIO $ getAsanaWorkspaces $ asanaConfigApiKey config
+      Just config -> liftIO $ A.getAsanaWorkspaces $ asanaConfigApiKey config
     (widget, enctype) <- generateFormPost $ settingsForm mconfig workspaces
     defaultLayout $ do
       setTitle "Settings - Napolitan"
       $(widgetFile "settings")
       $(widgetFile "pomodoro-js")
 
-  -- mauth <- maybeAuth
-  -- case mauth of
-  --   Nothing -> redirect HomeR
-  --   Just (Entity _ user) -> do
-  --     let masanaKey = (userAsanaApiKey user) :: Maybe Text
-  --         masanaWksId = (userAsanaWorkspaceId user) :: Maybe Int
-  --     workspaces <- liftIO $ getAsanaWorkspaces masanaKey
-  --     (widget, enctype) <- generateFormPost $ settingsForm masanaKey masanaWksId workspaces
-  --     defaultLayout $ do
-  --       setTitle "Settings - Napolitan"
-  --       $(widgetFile "settings")
-
 postSettingsR :: Handler RepHtml
 postSettingsR = do
   ((result, _), _) <- runFormPost $ settingsForm Nothing []
+  liftIO $ debugLog $ show result
   aid <- fromJust <$> maybeAuthId
   case result of
     FormSuccess (Settings key workspaces) -> do
-      runDB $ do
+      _ <- runDB $ do
         mrec <- getBy $ UniqueConfigByUserId aid
         case mrec of
           Nothing -> insert $ AsanaConfig aid key workspaces

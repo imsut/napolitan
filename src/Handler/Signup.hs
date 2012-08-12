@@ -1,9 +1,9 @@
 {-# LANGUAGE TupleSections, OverloadedStrings #-}
 module Handler.Signup where
 
+import DebugUtil
 import Import
 import qualified Yesod.Auth.OAuth as OA
-import Yesod.Logger
 import Yesod.Auth
 
 getSignupR :: Handler RepHtml
@@ -12,7 +12,7 @@ getSignupR = do
   case maid of
     Nothing -> redirect $ AuthR OA.twitterUrl -- weird. try again
     Just aid -> do
-      liftIO $ defaultDevelopmentLogger >>= flip logString (show maid)
+      liftIO $ debugLog $ show maid
       mconfig <- runDB $ getBy $ UniqueConfigByUserId aid
       case mconfig of
         Just (Entity _ (AsanaConfig _ _ [])) -> redirect SettingsR -- workspace not set

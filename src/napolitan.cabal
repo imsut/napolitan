@@ -36,6 +36,7 @@ library
                      Handler.Sync
 
     other-modules: Model.Asana
+                   DebugUtil
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT

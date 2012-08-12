@@ -36,6 +36,7 @@ import Data.Text (Text)
 import Data.Text.Encoding (decodeUtf8With, encodeUtf8)
 import Data.Text.Encoding.Error (lenientDecode)
 import Control.Arrow ((***))
+import DebugUtil
 
 -- | The site argument for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -177,7 +178,7 @@ instance YesodAuth App where
     logoutDest _ = HomeR
 
     getAuthId creds = runDB $ do
-      liftIO $ defaultDevelopmentLogger >>= (flip logString $ show $ credsExtra creds)
+      liftIO $ debugLog $ show $ credsExtra creds
       let userId = credsIdent creds
           extra = credsExtra creds
           screenName = fromJust $ lookup "screen_name" extra

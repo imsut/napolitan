@@ -13,7 +13,8 @@ urlAsanaWorkspaces :: String
 urlAsanaWorkspaces = "https://app.asana.com/api/1.0/workspaces"
 
 data AsanaWorkspace = AsanaWorkspace { ident :: Int,
-                                       name :: Text } deriving Show
+                                       name :: Text
+                                     } deriving Show
 
 -- parse JSON and construct a list of AsanaWorkspace
 -- {"data":[{"id":42742032946,"name":"RevenueEng"},{"id":723538443138,"name":"Family / Personal"}]}
