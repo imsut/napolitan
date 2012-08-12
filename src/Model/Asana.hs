@@ -5,16 +5,16 @@ import Control.Applicative ((<$>), (<*>))
 import Data.Aeson
 import Data.Aeson.Types
 import Data.Maybe
-import Data.Text (Text)
+import Data.Text (Text, pack)
 import qualified Data.Text.Encoding as E
 import qualified Network.HTTP.Conduit as C
 
 urlAsanaWorkspaces :: String
 urlAsanaWorkspaces = "https://app.asana.com/api/1.0/workspaces"
 
-data Workspace = Workspace { ident :: Int,
-                                       name :: Text
-                                     } deriving Show
+data Workspace = Workspace { ident :: Text,
+                             name :: Text
+                           } deriving Show
 
 -- parse JSON and construct a list of AsanaWorkspace
 -- {"data":[{"id":42742032946,"name":"RevenueEng"},{"id":723538443138,"name":"Family / Personal"}]}
@@ -24,7 +24,7 @@ instance FromJSON [Workspace] where
     parseJSON' list
     where
       parseJSON' :: [Object] -> Parser [Workspace]
-      parseJSON' = mapM $ \x -> Workspace <$> x .: "id" <*> x .: "name"
+      parseJSON' = mapM $ \x -> Workspace <$> (pack <$> (show <$> (x .: "id" :: Parser Integer))) <*> x .: "name"
   parseJSON _ = return []
 
 getWorkspaces :: Text -> IO [Workspace]

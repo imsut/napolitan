@@ -13,7 +13,7 @@ import qualified Model.Asana as A
 import Yesod.Auth (maybeAuthId)
 
 data Settings = Settings { apiKey :: Text
-                         , wksIds :: [Int]
+                         , wksIds :: [Text]
                          } deriving Show
 
 settingsAForm :: Maybe Settings -> [A.Workspace] -> AForm App App Settings
