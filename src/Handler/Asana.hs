@@ -1,17 +1,11 @@
 {-# LANGUAGE TupleSections, OverloadedStrings, FlexibleInstances #-}
-module Handler.Asana where
+module Handler.Asana(getAsanaR
+                    ) where
 
 import Import
-import Data.Aeson
-import Data.Aeson.Types
-import Data.Maybe
 import qualified Data.Map as M
-import qualified Data.Text.Encoding as E
 import qualified Model.Asana as A
-import qualified Network.HTTP.Conduit as C
 import Network.HTTP.Types
-import Yesod.Auth
-import Yesod.Json
 
 getAsanaR :: Text -> Handler RepJson
 getAsanaR "workspaces" = do
@@ -20,5 +14,6 @@ getAsanaR "workspaces" = do
       Nothing -> jsonToRepJson () >>= sendResponseStatus badRequest400
       Just "" -> jsonToRepJson () >>= sendResponseStatus badRequest400
       Just key -> do
-        jsonToRepJson $ M.fromList ([("foo", 123), ("bar", 456)] :: [(String, Integer)])
+        wks <- liftIO $ A.getAsanaWorkspaces key
+        jsonToRepJson $ M.fromList $ fmap (\a -> (A.name a, A.ident a)) wks
 getAsanaR _ = jsonToRepJson () >>= sendResponseStatus notFound404
