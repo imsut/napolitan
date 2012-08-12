@@ -14,6 +14,6 @@ getAsanaR "workspaces" = do
       Nothing -> jsonToRepJson () >>= sendResponseStatus badRequest400
       Just "" -> jsonToRepJson () >>= sendResponseStatus badRequest400
       Just key -> do
-        wks <- liftIO $ A.getAsanaWorkspaces key
+        wks <- liftIO $ A.getWorkspaces key
         jsonToRepJson $ M.fromList $ fmap (\a -> (A.name a, A.ident a)) wks
 getAsanaR _ = jsonToRepJson () >>= sendResponseStatus notFound404

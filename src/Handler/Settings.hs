@@ -16,12 +16,12 @@ data Settings = Settings { apiKey :: Text
                          , wksIds :: [Int]
                          } deriving Show
 
-settingsAForm :: Maybe Settings -> [A.AsanaWorkspace] -> AForm App App Settings
+settingsAForm :: Maybe Settings -> [A.Workspace] -> AForm App App Settings
 settingsAForm mset wks = Settings
     <$> areq textField keySettings (apiKey <$> mset)
     <*> areq (multiSelectFieldList wklist) wsSettings (wksIds <$> mset)
   where
-    wklist = fmap (\(A.AsanaWorkspace ident name) -> (name, ident)) wks
+    wklist = fmap (\(A.Workspace ident name) -> (name, ident)) wks
     keySettings = FieldSettings {
         fsLabel = fromString "Asana API Key"
       , fsTooltip = Nothing
@@ -37,7 +37,7 @@ settingsAForm mset wks = Settings
       , fsAttrs = []
       }
 
-settingsForm :: Maybe AsanaConfig -> [A.AsanaWorkspace] -> Html
+settingsForm :: Maybe AsanaConfig -> [A.Workspace] -> Html
                 -> MForm App App (FormResult Settings, Widget)
 settingsForm Nothing wks = renderTable $ settingsAForm Nothing wks
 settingsForm (Just (AsanaConfig _ key selected)) wks =
@@ -50,7 +50,7 @@ getSettingsR = do
     let mconfig = entityVal <$> mrec
     workspaces <- case mconfig of
       Nothing -> return []
-      Just config -> liftIO $ A.getAsanaWorkspaces $ asanaConfigApiKey config
+      Just config -> liftIO $ A.getWorkspaces $ asanaConfigApiKey config
     (widget, enctype) <- generateFormPost $ settingsForm mconfig workspaces
     defaultLayout $ do
       setTitle "Settings - Napolitan"

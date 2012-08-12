@@ -12,23 +12,23 @@ import qualified Network.HTTP.Conduit as C
 urlAsanaWorkspaces :: String
 urlAsanaWorkspaces = "https://app.asana.com/api/1.0/workspaces"
 
-data AsanaWorkspace = AsanaWorkspace { ident :: Int,
+data Workspace = Workspace { ident :: Int,
                                        name :: Text
                                      } deriving Show
 
 -- parse JSON and construct a list of AsanaWorkspace
 -- {"data":[{"id":42742032946,"name":"RevenueEng"},{"id":723538443138,"name":"Family / Personal"}]}
-instance FromJSON [AsanaWorkspace] where
+instance FromJSON [Workspace] where
   parseJSON (Object v) = do
     list <- v .: "data"
     parseJSON' list
     where
-      parseJSON' :: [Object] -> Parser [AsanaWorkspace]
-      parseJSON' = mapM $ \x -> AsanaWorkspace <$> x .: "id" <*> x .: "name"
+      parseJSON' :: [Object] -> Parser [Workspace]
+      parseJSON' = mapM $ \x -> Workspace <$> x .: "id" <*> x .: "name"
   parseJSON _ = return []
 
-getAsanaWorkspaces :: Text -> IO [AsanaWorkspace]
-getAsanaWorkspaces key = do
+getWorkspaces :: Text -> IO [Workspace]
+getWorkspaces key = do
   resp <- C.withManager $ \m ->
     C.httpLbs req m
   case decode $ C.responseBody resp of
