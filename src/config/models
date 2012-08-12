@@ -9,7 +9,7 @@ User
 AsanaConfig
     userId UserId
     apiKey Text
-    workspaces [Text]
+    workspaces [PersistWorkspace]
     UniqueConfigByUserId userId
     deriving Show
 

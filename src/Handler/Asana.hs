@@ -4,13 +4,16 @@ module Handler.Asana(getAsanaR
 
 import Import
 import qualified Data.Map as M
+import Data.Maybe
 import qualified Model.Asana as A
 import Network.HTTP.Types
+import Yesod.Auth (maybeAuthId)
 
 import DebugUtil
 
 getAsanaR :: Text -> Handler RepJson
 getAsanaR "workspaces" = do
+    aid <- fromJust <$> maybeAuthId
     mkey <- lookupGetParam "key"
     case mkey of
       Nothing -> jsonToRepJson () >>= sendResponseStatus badRequest400
