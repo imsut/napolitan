@@ -556,16 +556,6 @@ body section:first-child {
 #tasks thead tr th {
 }
 
-#tasks tbody tr:first-child td {
-  font-size: 140%;
-  font-weight: bold;
-}
-
-#tasks tbody tr td:first-child {
-  width: 32px;
-  cursor: move;
-}
-
 #pomodoro-timer {
   height: 120px;
   padding-top: 100px;

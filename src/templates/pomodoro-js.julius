@@ -1,10 +1,12 @@
 // initialization
 $(function() {
+  /*
   $("#tasks tbody").sortable({
     handle: 'td:first'
   }).disableSelection();
+  */
 
- var syncWithAsana = function() {
+  var syncWithAsana = function() {
     $.getJSON('/sync/asana', function(data) {
     });
   }

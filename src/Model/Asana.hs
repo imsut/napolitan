@@ -2,6 +2,7 @@
 module Model.Asana (Workspace(..),
                     PersistWorkspace,
                     persist,
+                    unpersist,
                     getWorkspaces
                    ) where
 
@@ -35,6 +36,9 @@ instance FromJSON [Workspace] where
 
 persist :: Workspace -> PersistWorkspace
 persist (Workspace ident name) = (ident, name)
+
+unpersist :: PersistWorkspace -> Workspace
+unpersist (ident, name) = Workspace ident name
 
 getWorkspaces :: Text -> IO [Workspace]
 getWorkspaces key = do

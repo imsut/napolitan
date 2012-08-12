@@ -5,7 +5,6 @@ module Handler.Settings
     ) where
 
 import Data.Maybe
-import Data.String
 import Data.Text
 import DebugUtil
 import Import

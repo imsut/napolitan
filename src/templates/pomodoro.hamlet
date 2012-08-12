@@ -1,14 +1,46 @@
 <section>
   <div class="page-header">
-    <h1>Pomodoro
+    <h1>Today's Tasks
 
   <div class="row">
-    <div class="span2 offset2">
-      <a class="btn btn-danger btn-large span2" data-toggle="modal" href="#modal-pomodoro" data-backdrop="static" onclick="Napolitan.startPomodoro()">Pomodoro
-    <div class="span2 offset1">
-      <a class="btn btn-info btn-large span2" data-toggle="modal" href="#modal-break" data-backdrop="static">Short Break
-    <div class="span2 offset1">
-       <a class="btn btn-success btn-large span2" data-toggle="modal" href="#modal-break" data-backdrop="static">Long Break
+    <form class="form-inline span8 offset2">
+      <fieldset class="pull-right">
+        <a href="#modal-sync" data-toggle="modal" data-backdrop="static" class="" onclick="syncWithAsana()">
+          <i class="icon-refresh">
+          \ Sync with Asana Workspace
+        \ 
+        <select id="asanaWorkspaces">
+          $forall Workspace ident name <- workspaces
+            <option value="#{ident}">#{name}
+
+  <div class="modal hide" id="modal-sync">
+    <div class="modal-body">
+      <h3>Synchronizing tasks with Asana...
+      <p><img src="/static/img/ajax-loader.gif" title="synchronizing tasks..."/>
+
+  <div class="row">
+    <table id="tasks" class="table table-striped span8 offset2">
+      <thead>
+        <tr>
+          <th>Task
+          <th>Due Date
+          <th class="span2">
+      <tbody>
+        <tr>
+          <td>Develop "Hello World"
+          <td>2012-7-20
+          <td>
+            <a class="btn btn-danger" data-toggle="modal" href="#modal-pomodoro" data-backdrop="static" onclick="Napolitan.startPomodoro()">Pomodoro
+        <tr>
+          <td>Test "Hello World"
+          <td>2012-7-21
+          <td>
+            <a class="btn btn-danger" data-toggle="modal" href="#modal-pomodoro" data-backdrop="static" onclick="Napolitan.startPomodoro()">Pomodoro
+        <tr>
+          <td>Test "Hello World"
+          <td>2012-7-21
+          <td>
+            <a class="btn btn-danger" data-toggle="modal" href="#modal-pomodoro" data-backdrop="static" onclick="Napolitan.startPomodoro()">Pomodoro
 
   <div class="modal hide" id="modal-pomodoro">
     <div class="modal-header">
@@ -18,6 +50,12 @@
     <div class="modal-footer">
       <a href="#" class="btn btn-danger pull-left" data-dismiss="modal">Abort Pomodoro
       <a href="#" class="btn btn-primary">Task Finished
+
+  <div class="row">
+    <div class="span2 offset3">
+      <a class="btn btn-info btn-large span2" data-toggle="modal" href="#modal-break" data-backdrop="static">Short Break
+    <div class="span2 offset1">
+       <a class="btn btn-success btn-large span2" data-toggle="modal" href="#modal-break" data-backdrop="static">Long Break
 
   <div class="modal hide" id="modal-break">
     <div class="modal-header">
@@ -29,46 +67,10 @@
 
 <section>
   <div class="page-header">
-    <h1>Today's Tasks
-
-  <div class="row">
-    <p class="span2 offset8">
-      <a href="#modal-sync" data-toggle="modal" data-backdrop="static" class="pull-right" onclick="syncWithAsana()">
-        <i class="icon-refresh">
-        \ Sync with Asana
-
-  <div class="modal hide" id="modal-sync">
-    <div class="modal-body">
-      <h3>Synchronizing tasks with Asana...
-      <p><img src="/static/img/ajax-loader.gif" title="synchronizing tasks..."/>
-
-  <div class="row">
-    <table id="tasks" class="table table-striped span8 offset2">
-      <thead>
-        <tr>
-          <th>
-          <th>Task
-          <th>Due Date
-      <tbody>
-        <tr>
-          <td><i class="icon-resize-vertical">
-          <td>Develop "Hello World"
-          <td>2012-7-20
-        <tr>
-          <td><i class="icon-resize-vertical">
-          <td>Test "Hello World"
-          <td>2012-7-21
-        <tr>
-          <td><i class="icon-resize-vertical">
-          <td>Test "Hello World"
-          <td>2012-7-21
-
-<section>
-  <div class="page-header">
     <h1>Completed Tasks
 
   <div class="row">
-    <table id="completed-tasks" class="table table-striped span8 offset2">
+    <table id="completed-tasks" class="table table-striped span7 offset2">
       <thead>
         <tr>
           <th>Task
