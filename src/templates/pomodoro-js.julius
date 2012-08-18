@@ -1,12 +1,14 @@
 // initialization
 $(function() {
-  var syncTasksWithAsana = function() {
+  var syncWithAsana = function() {
+    $('#modal-sync').modal({ backdrop: 'static', keyboard: false });
+  
     var ws = $('#asana-workspaces').val();
     $.getJSON('/sync/asana', { 'workspace': ws }, function(data) {
       // update workspace list
       $('#asana-workspaces option').remove();
       var sel = $("#asana-workspaces");
-      $.eash(data.workspaces, function(wsId, wsName) {
+      $.each(data[0], function(wsId, wsName) {
         var opt = $(document.createElement('option'));
         opt.attr('value', wsId);
         opt.text(wsName);
@@ -17,7 +19,7 @@ $(function() {
       // update task list
       $('#tasks tbody tr').remove();
       var tasks = $('#tasks tbody');
-      $.eash(data.tasks, function(task) {
+      $.each(data[1], function(idx, task) {
         var tr = $(document.createElement('tr'));
         tr.attr('id', 'task-' + task.id);
         
@@ -26,16 +28,26 @@ $(function() {
         tr.append(td1);
 
         var td2 = $(document.createElement('td'));
-        td2.text(task.due_on);
+        td2.text(task.due_on || "");
         tr.append(td2);
+
+        var btn = $(document.createElement('a'));
+        btn.attr('class', 'btn btn-danger');
+        btn.attr('href', '#modal-pomodoro');
+        btn.text('Pomodoro');
+        var td3 = $(document.createElement('td'));
+        td3.append(btn);
+        tr.append(td3);
 
         tasks.append(tr);
       });
+
+      $('#modal-sync').modal('hide');
     });
   }
 
-  $("#sync-tasks").click(syncTasksWithAsana);
-  $("#asana-workspaces").change(syncTasksWithAsana);
+  $("#sync-tasks").click(syncWithAsana);
+  $("#asana-workspaces").change(syncWithAsana);
 
   $("#fieldAsanaKey").blur(function(event) {
     var field = $("#fieldAsanaKey");

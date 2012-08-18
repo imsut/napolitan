@@ -4,6 +4,7 @@ module Handler.Asana(getAsanaR,
                     ) where
 
 import Import
+import Data.Aeson (toJSON)
 import qualified Data.Map as M
 import Data.Maybe
 import qualified Model.Asana as A
@@ -42,22 +43,19 @@ getSyncR :: Handler RepJson
 getSyncR = do
     aid <- fromJust <$> maybeAuthId
     mwkid <- lookupGetParam "workspace"
-    case mwkid of
-      Nothing -> jsonToRepJson () >>= sendResponseStatus badRequest400
-      Just "" -> jsonToRepJson () >>= sendResponseStatus badRequest400
-      Just wkid -> do
-        mkey <- do
-          mrec <- runDB $ getBy $ UniqueConfigByUserId aid
-          case mrec of
-            Nothing -> return Nothing
-            Just rec -> (return . Just . asanaConfigApiKey . entityVal) rec
-        wks <- case mkey of
-          Nothing -> return []
-          Just key -> liftIO $ A.getWorkspaces key
-        tasks <- case mkey of
-          Nothing -> return []
-          Just key -> liftIO $ A.getTasks key wkid
-        jsonToRepJson $ (
-            M.fromList ([("workspaces", True), ("bar", False)] :: [(Text, Bool)])
-          , M.fromList ([("workspaces", True), ("bar", False)] :: [(Text, Bool)])
-          )
+    mkey <- do
+      mrec <- runDB $ getBy $ UniqueConfigByUserId aid
+      case mrec of
+        Nothing -> return Nothing
+        Just rec -> (return . Just . asanaConfigApiKey . entityVal) rec
+    wks <- case mkey of
+      Nothing -> return []
+      Just key -> liftIO $ A.getWorkspaces key
+    tasks <- case (mwkid, mkey) of
+      (Nothing, _) -> return []
+      (Just "", _) -> return []
+      (_, Nothing) -> return []
+      (Just wkid, Just key) -> liftIO $ A.getTasks key wkid
+    -- TODO: update DB here
+    let json = toJSON (M.fromList $ fmap A.persist wks, A.filterByStatus "today" tasks)
+    jsonToRepJson json

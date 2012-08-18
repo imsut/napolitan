@@ -5,7 +5,7 @@
   <div class="row">
     <form class="form-inline span8 offset2">
       <fieldset class="pull-right">
-        <a id="sync-tasks" href="#modal-sync" data-toggle="modal" data-backdrop="static" onclick="syncWithAsana()">
+        <a id="sync-tasks" href="#modal-sync">
           <i class="icon-refresh">
           \ Sync with Asana Workspace
         \ 
@@ -30,17 +30,17 @@
           <td>Develop "Hello World"
           <td>2012-7-20
           <td>
-            <a class="btn btn-danger" data-toggle="modal" href="#modal-pomodoro" data-backdrop="static" onclick="Napolitan.startPomodoro()">Pomodoro
+            <a class="btn btn-danger" data-toggle="modal" href="#modal-pomodoro" data-backdrop="static" data-keyboard="false" onclick="Napolitan.startPomodoro()">Pomodoro
         <tr>
           <td>Test "Hello World"
           <td>2012-7-21
           <td>
-            <a class="btn btn-danger" data-toggle="modal" href="#modal-pomodoro" data-backdrop="static" onclick="Napolitan.startPomodoro()">Pomodoro
+            <a class="btn btn-danger" data-toggle="modal" href="#modal-pomodoro" data-backdrop="static" data-keyboard="false" onclick="Napolitan.startPomodoro()">Pomodoro
         <tr>
           <td>Test "Hello World"
           <td>2012-7-21
           <td>
-            <a class="btn btn-danger" data-toggle="modal" href="#modal-pomodoro" data-backdrop="static" onclick="Napolitan.startPomodoro()">Pomodoro
+            <a class="btn btn-danger" data-toggle="modal" href="#modal-pomodoro" data-backdrop="static" data-keyboard="false" onclick="Napolitan.startPomodoro()">Pomodoro
 
   <div class="modal hide" id="modal-pomodoro">
     <div class="modal-header">

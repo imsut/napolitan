@@ -6,6 +6,7 @@ module Model.Asana (Workspace(..),
                     unpersist,
                     getWorkspaces,
                     getTasks,
+                    filterByStatus
                    ) where
 
 import Control.Applicative ((<$>), (<*>))
@@ -36,21 +37,10 @@ type PersistWorkspace = (Text, Text)
 instance FromJSON [Workspace] where
   parseJSON (Object v) = do
     list <- v .: "data"
-    parseJSON' list
+    mapM parse list
     where
-      parseJSON' :: [Object] -> Parser [Workspace]
-      parseJSON' = mapM $ \x -> Workspace <$> (pack <$> (show <$> (x .: "id" :: Parser Integer))) <*> x .: "name"
-  parseJSON _ = return []
-
-data Task = Task { taskId :: Text
-                 , taskName :: Text
-                 , projectName :: Text
-                 , dueOn :: Text
-                 } deriving Show
-
-instance FromJSON [Task] where
-  parseJSON (Object v) = do
-    undefined
+      parse :: Object -> Parser Workspace
+      parse x = Workspace <$> (pack <$> (show <$> (x .: "id" :: Parser Integer))) <*> x .: "name"
   parseJSON _ = return []
 
 persist :: Workspace -> PersistWorkspace
@@ -58,6 +48,40 @@ persist (Workspace ident name) = (ident, name)
 
 unpersist :: PersistWorkspace -> Workspace
 unpersist (ident, name) = Workspace ident name
+
+data Task = Task { taskId :: Text
+                 , taskName :: Text
+                 , taskStatus :: Text
+                 , projectName :: Maybe Text
+                 , dueOn :: Maybe Text
+                 } deriving Show
+
+instance FromJSON [Task] where
+  parseJSON (Object v) = do
+      list <- v .: "data"
+      mapM parse list
+    where
+      parse :: Object -> Parser Task
+      parse x = Task <$> (pack <$> (show <$> (x .: "id" :: Parser Integer)))
+                     <*> x .: "name"
+                     <*> x .: "assignee_status"
+                     <*> projectName x
+                     <*> x .:? "due_on"
+      projectName :: Object -> Parser (Maybe Text)
+      projectName y = do
+        projects <- y .: "projects"
+        case projects of
+          [] -> return Nothing
+          (p:_) -> fmap Just (p .: "name")
+  parseJSON _ = return []
+
+instance ToJSON Task where
+  toJSON t = object $ catMaybes [ Just $ "id" .= taskId t
+                                , Just $ "name" .= taskName t
+                                , Just $ "status" .= taskStatus t
+                                , ("projectName" .=) <$> projectName t
+                                , Just $ "due_on" .= dueOn t
+                                ]
 
 getWorkspaces :: Text -> IO [Workspace]
 getWorkspaces key = do
@@ -78,3 +102,7 @@ getTasks key workspaceId = do
       Just workspaces -> return workspaces
   where
     req = C.applyBasicAuth (E.encodeUtf8 key) "" $ fromJust $ C.parseUrl $ urlTasks workspaceId
+
+-- filter tasks by "assignee_status", which takes one of "inbox", "today", "upcoming", and "later"
+filterByStatus :: Text -> [Task] -> [Task]
+filterByStatus status = filter (\t -> status == taskStatus t)
