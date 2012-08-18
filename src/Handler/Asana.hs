@@ -7,8 +7,12 @@ import Import
 import Data.Aeson (toJSON)
 import qualified Data.Map as M
 import Data.Maybe
+import Data.Text (unpack)
+import Data.Time.Calendar (Day)
+import qualified Data.Time.Format as F
 import qualified Model.Asana as A
 import Network.HTTP.Types
+import System.Locale (defaultTimeLocale)
 import Yesod.Auth (maybeAuthId)
 
 import DebugUtil
@@ -29,15 +33,14 @@ getAsanaR "workspaces" = do
 getAsanaR _ = jsonToRepJson () >>= sendResponseStatus notFound404
 
 -- only supports Asana now
+-- assumes AsanaConfig table has a record for this user
 getSyncR :: Handler RepJson
 getSyncR = do
     aid <- fromJust <$> maybeAuthId
     mwkid <- lookupGetParam "workspace"
     mkey <- do
       mrec <- runDB $ getBy $ UniqueConfigByUserId aid
-      case mrec of
-        Nothing -> return Nothing
-        Just rec -> (return . Just . asanaConfigApiKey . entityVal) rec
+      (return . Just . asanaConfigApiKey . entityVal . fromJust) mrec
     wks <- case mkey of
       Nothing -> return []
       Just key -> liftIO $ A.getWorkspaces key
@@ -46,6 +49,24 @@ getSyncR = do
       (Just "", _) -> return []
       (_, Nothing) -> return []
       (Just wkid, Just key) -> liftIO $ A.getTasks key wkid
-    -- TODO: update DB here
+    runDB $ do
+      mrec <- getBy $ UniqueConfigByUserId aid
+      case mrec of
+        Nothing -> return ()
+        Just (Entity eid _) ->
+          update eid [ AsanaConfigWorkspaces =. fmap A.persist wks ]
+      mapM_ updateTask tasks
     let json = toJSON (wks, A.filterByStatus "today" tasks)
     jsonToRepJson json
+  where
+    updateTask t = do
+      mrec <- getBy $ UniqueTaskByExtId $ A.taskId t
+      case mrec of
+        Nothing -> insert $ Task (A.taskId t) (A.taskName t) (A.dueOn t >>= textToDay)
+        Just (Entity eid _) -> do
+          update eid [ TaskName =. (A.taskName t)
+                     , TaskDueOn =. (A.dueOn t >>= textToDay) ]
+          return eid
+
+    textToDay :: Text -> Maybe Day
+    textToDay = F.parseTime defaultTimeLocale "%Y-%m-%d" . unpack

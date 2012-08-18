@@ -88,6 +88,7 @@ library
                  , containers
                  , aeson
                  , http-types
+                 , old-locale
 --                 , transformers                  >= 0.3
 --                 , authenticate-oauth            >= 1.3
 

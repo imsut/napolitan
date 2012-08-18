@@ -14,9 +14,10 @@ AsanaConfig
     deriving Show
 
 Task
-    externalId Text Maybe
+    externalId Text
     name Text
     dueOn Day Maybe
+    UniqueTaskByExtId externalId
     deriving Show
 
 Pomodoro
