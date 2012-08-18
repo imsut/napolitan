@@ -18,7 +18,7 @@ import Yesod.Static
 import Yesod.Auth
 import Yesod.Default.Config
 import Yesod.Default.Util (addStaticContentExternal)
-import Yesod.Logger (Logger, logMsg, formatLogText, logString, defaultDevelopmentLogger)
+import Yesod.Logger (Logger, logMsg, formatLogText)
 import Network.HTTP.Conduit (Manager)
 import qualified Settings
 import qualified Database.Persist.Store
