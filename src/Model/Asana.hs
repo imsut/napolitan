@@ -43,6 +43,9 @@ instance FromJSON [Workspace] where
       parse x = Workspace <$> (pack <$> (show <$> (x .: "id" :: Parser Integer))) <*> x .: "name"
   parseJSON _ = return []
 
+instance ToJSON Workspace where
+  toJSON w = object $ [ "id" .= ident w, "name" .= name w ]
+
 persist :: Workspace -> PersistWorkspace
 persist (Workspace ident name) = (ident, name)
 

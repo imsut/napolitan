@@ -8,10 +8,10 @@ $(function() {
       // update workspace list
       $('#asana-workspaces option').remove();
       var sel = $("#asana-workspaces");
-      $.each(data[0], function(wsId, wsName) {
+      $.each(data[0], function(idx, ws) {
         var opt = $(document.createElement('option'));
-        opt.attr('value', wsId);
-        opt.text(wsName);
+        opt.attr('value', ws.id);
+        opt.text(ws.name);
         sel.append(opt);
       });
       sel.val(ws);

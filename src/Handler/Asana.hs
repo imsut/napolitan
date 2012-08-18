@@ -47,5 +47,5 @@ getSyncR = do
       (_, Nothing) -> return []
       (Just wkid, Just key) -> liftIO $ A.getTasks key wkid
     -- TODO: update DB here
-    let json = toJSON (M.fromList $ fmap A.persist wks, A.filterByStatus "today" tasks)
+    let json = toJSON (wks, A.filterByStatus "today" tasks)
     jsonToRepJson json
