@@ -1,15 +1,41 @@
 // initialization
 $(function() {
-  /*
-  $("#tasks tbody").sortable({
-    handle: 'td:first'
-  }).disableSelection();
-  */
+  var syncTasksWithAsana = function() {
+    var ws = $('#asana-workspaces').val();
+    $.getJSON('/sync/asana', { 'workspace': ws }, function(data) {
+      // update workspace list
+      $('#asana-workspaces option').remove();
+      var sel = $("#asana-workspaces");
+      $.eash(data.workspaces, function(wsId, wsName) {
+        var opt = $(document.createElement('option'));
+        opt.attr('value', wsId);
+        opt.text(wsName);
+        sel.append(opt);
+      });
+      sel.val(ws);
 
-  var syncWithAsana = function() {
-    $.getJSON('/sync/asana', function(data) {
+      // update task list
+      $('#tasks tbody tr').remove();
+      var tasks = $('#tasks tbody');
+      $.eash(data.tasks, function(task) {
+        var tr = $(document.createElement('tr'));
+        tr.attr('id', 'task-' + task.id);
+        
+        var td1 = $(document.createElement('td'));
+        td1.text(task.name);
+        tr.append(td1);
+
+        var td2 = $(document.createElement('td'));
+        td2.text(task.due_on);
+        tr.append(td2);
+
+        tasks.append(tr);
+      });
     });
   }
+
+  $("#sync-tasks").click(syncTasksWithAsana);
+  $("#asana-workspaces").change(syncTasksWithAsana);
 
   $("#fieldAsanaKey").blur(function(event) {
     var field = $("#fieldAsanaKey");

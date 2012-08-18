@@ -33,7 +33,6 @@ library
                      Handler.Stats
                      Handler.Signup
                      Handler.Settings
-                     Handler.Sync
 
     other-modules: Model.Asana
                    DebugUtil

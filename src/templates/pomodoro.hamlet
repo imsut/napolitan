@@ -5,11 +5,11 @@
   <div class="row">
     <form class="form-inline span8 offset2">
       <fieldset class="pull-right">
-        <a href="#modal-sync" data-toggle="modal" data-backdrop="static" class="" onclick="syncWithAsana()">
+        <a id="sync-tasks" href="#modal-sync" data-toggle="modal" data-backdrop="static" onclick="syncWithAsana()">
           <i class="icon-refresh">
           \ Sync with Asana Workspace
         \ 
-        <select id="asanaWorkspaces">
+        <select id="asana-workspaces">
           $forall Workspace ident name <- workspaces
             <option value="#{ident}">#{name}
 

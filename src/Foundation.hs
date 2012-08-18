@@ -150,6 +150,7 @@ instance Yesod App where
     -- route name, then a boolean indicating if it's a write request
     isAuthorized SettingsR _ = isSignedIn
     isAuthorized (AsanaR _) _ = isSignedIn
+    isAuthorized SyncR _ = isSignedIn
     isAuthorized _ _ = return Authorized
 
 isSignedIn :: GHandler s App AuthResult
