@@ -49,13 +49,13 @@ getSyncR = do
       (Just "", _) -> return []
       (_, Nothing) -> return []
       (Just wkid, Just key) -> liftIO $ A.getTasks key wkid
-    runDB $ do
-      mrec <- getBy $ UniqueConfigByUserId aid
-      case mrec of
-        Nothing -> return ()
-        Just (Entity eid _) ->
-          update eid [ AsanaConfigWorkspaces =. fmap A.persist wks ]
-      mapM_ updateTask tasks
+    -- runDB $ do
+    --   mrec <- getBy $ UniqueConfigByUserId aid
+    --   case mrec of
+    --     Nothing -> return ()
+    --     Just (Entity eid _) ->
+    --       update eid [ AsanaConfigWorkspaces =. fmap A.persist wks ]
+    --   mapM_ updateTask tasks
     let json = toJSON (wks, A.filterByStatus "today" tasks)
     jsonToRepJson json
   where
