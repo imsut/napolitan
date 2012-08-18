@@ -28,16 +28,6 @@ getAsanaR "workspaces" = do
         jsonToRepJson $ M.fromList $ fmap (\a -> (A.ident a, A.name a)) wks
 getAsanaR _ = jsonToRepJson () >>= sendResponseStatus notFound404
 
-{-
-asanaApiKey :: UserId -> GHandler s m (Maybe Text)
---asanaApiKey :: UserId -> YesodDB s m (Maybe Text)
-asanaApiKey aid = runDB $ do
-    (getBy $ UniqueConfigByUserId aid) >>= \mrec ->
-      case mrec of
-        Nothing -> return Nothing
-        Just rec -> (return . Just . asanaConfigApiKey . entityVal) rec
--}
-
 -- only supports Asana now
 getSyncR :: Handler RepJson
 getSyncR = do
