@@ -42,7 +42,7 @@ postSettingsR = do
   case result of
     FormSuccess (Settings key) -> do
       wks <- liftIO $ A.getWorkspaces key
-      case wks of
+      _ <- case wks of
         [] -> redirect SettingsR -- invalid key; show form again
         _ -> do
           runDB $ do
