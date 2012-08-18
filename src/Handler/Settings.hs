@@ -54,7 +54,3 @@ postSettingsR = do
                 return eid
       redirect HomeR
     _ -> redirect SettingsR -- show form again
-
---        aDomId <- lift newIdent
---        <label for=#{aDomId}>Asana API Key
---        <input type="text" id=#{aDomId} class="span3" placeholder="Type something…">
