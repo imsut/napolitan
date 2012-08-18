@@ -1,3 +1,17 @@
+Just wkid -> do
+  runDB $ getBy $ UniqueConfigByUserId aid >>= \mrec ->
+  (asanaConfigApiKey . entityVal) <$> mrec >>= \key ->
+  liftIO $ A.getWorkspaces key >>= \wks ->
+  liftIO $ A.getTasks key wkid >>= \tasks ->
+
+
+fromJust <$> maybeAuthId >>= \aid ->
+runDB $ getBy $ UniqueConfigByUserId aid >>= \mrec ->
+let mconfig = entityVal <$> mrec
+in generateFormPost $ settingsForm mconfig >>= (widget, enctype)
+
+
+
     req = applyBasicAuth (E.encodeUtf8 key) "" $ parseUrl $ unpack uriAsanaWorkspaces
 
 Handler/Settings.hs:43:50:
