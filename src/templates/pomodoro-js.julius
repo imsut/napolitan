@@ -55,35 +55,60 @@ $(function() {
     });
   }
 
-  $("#sync-tasks").click(syncWithAsana);
-  $("#asana-workspaces").change(syncWithAsana);
+  var timer = null;
 
-  var startPomodoro = function() {
-    $('#modal-pomodoro').modal({ backdrop: 'static', keyboard: false });
+  var startSession = function(durationInSec, type) {
+    $('#finish-' + type).removeClass('btn-success').addClass('btn-danger')
+    $('#finish-' + type).text('Abort');
+    $('#modal-' + type).modal({ backdrop: 'static', keyboard: false });
 
     // Chrome wouldn't play sound without reloading.
-    var audio = document.getElementById("audio-finish");
-    audio.load();
+    document.getElementById("audio-finish").load();
 
-    var timer = new CountdownTimer(3);
+    timer = new CountdownTimer(durationInSec);
     timer.done(function() {
+      $('#finish-' + type).removeClass('btn-danger').addClass('btn-success')
+      $('#finish-' + type).text('Close');
       var audio = document.getElementById("audio-finish");
       audio.pause();
       audio.currentTime = 0;
-      audio.play();
+//      audio.play();
     });
     timer.tick(function(restInMillis) {
-      var minutes = Math.round(restInMillis / 60 / 1000);
-      var seconds = Math.round((restInMillis % (60 * 1000)) / 1000);
-      $('#pomodoro-timer').text(minutes + ":" + (seconds < 10 ? "0" + seconds : seconds));
+      var minutes = Math.floor(restInMillis / 60 / 1000);
+      var seconds = Math.floor((restInMillis % (60 * 1000)) / 1000);
+      $('#' + type + '-timer').text(minutes + ":" + (seconds < 10 ? "0" + seconds : seconds));
     });
     timer.start();
+  }
+
+  var finishSession = function(type) {
+    if (timer) {
+      timer.stop();
+    }
+    $('#modal-' + type).modal('hide');
+  }
+
+  var startPomodoro = function() {
+    startSession(3, 'pomodoro');
   }
 
   var completeTask = function() {
   }
 
   var continueTomorrow = function() {
+  }
+
+  var finishPomodoro = function() {
+    finishSession('pomodoro');
+  }
+
+  var startBreak = function(durationInSec) {
+    startSession(durationInSec, 'break');
+  }
+
+  var stopBreak = function() {
+    finishSession('break');
   }
 
   var CountdownTimer = function(durationInSec) {
@@ -99,7 +124,12 @@ $(function() {
       this._tick()
     },
 
+    stop: function() {
+      this.enable = false;
+    },
+
     _tick: function() {
+      if (!this.enable) return;
       var rest = this.endEpochTime - Date.now();
       if (this.callbackOnTick) {
         this.callbackOnTick.call(this, rest);
@@ -123,6 +153,14 @@ $(function() {
       this.callbackOnTick = callback;
     },
   };
+
+  // bind events to event handlers
+  $('#sync-tasks').click(syncWithAsana);
+  $('#asana-workspaces').change(syncWithAsana);
+  $('#finish-pomodoro').click(finishPomodoro);
+  $('#break-short').click(function() { startBreak(5 * 60); });
+  $('#break-long').click(function() { startBreak(20 * 60); });
+  $('#finish-break').click(stopBreak);
 
   // start sync-ing to display today's tasks
 //  syncWithAsana();

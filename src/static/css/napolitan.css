@@ -560,7 +560,8 @@ body section:first-child {
 #tasks thead tr th {
 }
 
-#pomodoro-timer {
+#pomodoro-timer,
+#break-timer {
   height: 120px;
   padding-top: 100px;
 /*  line-height: 100px;*/
