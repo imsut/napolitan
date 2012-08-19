@@ -31,17 +31,25 @@ $(function() {
         td2.text(task.due_on || "");
         tr.append(td2);
 
-        var btn = $(document.createElement('a'));
-        btn.attr('class', 'btn btn-danger');
-        btn.attr('href', '#');
-        btn.text('Pomodoro');
-        btn.click(startPomodoro);
-        var td3 = $(document.createElement('td'));
-        td3.append(btn);
+        var td3 = $(
+            '<td><div class="btn-toolbar no-margin">'
+          + '<div class="btn-group">'
+            + '<a class="btn btn-danger start-pomodoro" href="#">Pomodoro</a></div>'
+          + '<div class="btn-group">'
+            + '<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">Finish '
+            + '<span class="caret"></span></a>'
+            + '<ul class="dropdown-menu">'
+              + '<li><a href="#" class="complete-task">Complete Task</a></li>'
+              + '<li><a href="#" class="continue-tomorrow">Continue Tomorrow</a></li>'
+            + '</ul>'
+          + '</div></div></td>');
         tr.append(td3);
 
         tasks.append(tr);
       });
+      $('#tasks tbody tr a.start-pomodoro').click(startPomodoro);
+      $('#tasks tbody tr a.complete-task').click(completeTask);
+      $('#tasks tbody tr a.continue-tomorrow').click(continueTomorrow);
 
       $('#modal-sync').modal('hide');
     });
@@ -52,23 +60,72 @@ $(function() {
 
   var startPomodoro = function() {
     $('#modal-pomodoro').modal({ backdrop: 'static', keyboard: false });
+
+    // Chrome wouldn't play sound without reloading.
+    var audio = document.getElementById("audio-finish");
+    audio.load();
+
+    var timer = new CountdownTimer(3);
+    timer.done(function() {
+      var audio = document.getElementById("audio-finish");
+      audio.pause();
+      audio.currentTime = 0;
+      audio.play();
+    });
+    timer.tick(function(restInMillis) {
+      var minutes = Math.round(restInMillis / 60 / 1000);
+      var seconds = Math.round((restInMillis % (60 * 1000)) / 1000);
+      $('#pomodoro-timer').text(minutes + ":" + (seconds < 10 ? "0" + seconds : seconds));
+    });
+    timer.start();
   }
 
-  $("#fieldAsanaKey").blur(function(event) {
-    var field = $("#fieldAsanaKey");
-    var key = field.val();
-    $.getJSON('/proxy/asana/workspaces', { 'key': key }, function(data) {
-      $("#fieldAsanaWorkspaces option").remove();
-      $.each(data, function(wsId, wsName) {
-        var opt = $(document.createElement('option'));
-        opt.attr('value', wsId);
-        opt.text(wsName);
-        $("#fieldAsanaWorkspaces").append(opt);
-      });
-    });
-  });
+  var completeTask = function() {
+  }
+
+  var continueTomorrow = function() {
+  }
+
+  var CountdownTimer = function(durationInSec) {
+    this.endEpochTime = Date.now() + durationInSec * 1000;
+    this.enable = false;
+    this.callbackOnTick = null;
+    this.callbackWhenDone = null;
+  }
+
+  CountdownTimer.prototype = {
+    start: function() {
+      this.enable = true;
+      this._tick()
+    },
+
+    _tick: function() {
+      var rest = this.endEpochTime - Date.now();
+      if (this.callbackOnTick) {
+        this.callbackOnTick.call(this, rest);
+      }
+      if (rest < 0) {
+        if (this.callbackWhenDone) {
+          this.callbackWhenDone.call(this, rest);
+        }
+        return;
+      }
+
+      var thisObj = this;
+      setTimeout(function() { thisObj._tick.call(thisObj); }, 1000);
+    },
+
+    done: function(callback) {
+      this.callbackWhenDone = callback;
+    },
+
+    tick: function(callback) {
+      this.callbackOnTick = callback;
+    },
+  };
 
   // start sync-ing to display today's tasks
-  syncWithAsana();
+//  syncWithAsana();
+  $('#test').click(startPomodoro);
 });
 

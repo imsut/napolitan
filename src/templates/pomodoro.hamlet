@@ -27,17 +27,35 @@
         <tr>
           <th>Task
           <th>Due Date
-          <th class="span2">
+          <th class="span3">
       <tbody>
+        <tr>
+          <td>Develop "Hello World"
+          <td>2012-7-20
+          <td>
+            <div class="btn-toolbar no-margin">
+              <div class="btn-group">
+                <a class="btn btn-danger" href="#" id="test">Pomodoro
+              <div class="btn-group">
+                <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                  Finish #
+                  <span class="caret">
+                <ul class="dropdown-menu">
+                  <li>
+                    <a href="#">Complete Task
+                  <li>
+                    <a href="#">Continue Tomorrow
 
   <div class="modal hide" id="modal-pomodoro">
     <div class="modal-header">
       <h3>Running Pomodoro...
     <div class="modal-body">
       <p id="pomodoro-timer">25:00
+      <audio id="audio-finish" preload="auto" autobuffer>
+        <source src=@{StaticR audio_b_020_wav} type="audio/x-wav">
     <div class="modal-footer">
       <a href="#" class="btn btn-danger pull-left" data-dismiss="modal">Abort Pomodoro
-      <a href="#" class="btn btn-primary">Task Finished
+      <a id="finish-task" href="#" class="btn btn-primary">Task Finished
 
   <div class="row">
     <div class="span2 offset3">
@@ -55,10 +73,10 @@
 
 <section>
   <div class="page-header">
-    <h1>Completed Tasks
+    <h1>Finished Tasks
 
   <div class="row">
-    <table id="completed-tasks" class="table table-striped span7 offset2">
+    <table id="finished-tasks" class="table table-striped span7 offset2">
       <thead>
         <tr>
           <th>Task
