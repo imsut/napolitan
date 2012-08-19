@@ -7,7 +7,7 @@
       <fieldset class="pull-right">
         <a id="sync-tasks" href="#modal-sync">
           <i class="icon-refresh">
-          \ Sync with Asana Workspace
+          \ Sync with Asana
         \ 
         <select id="asana-workspaces">
           $forall Workspace ident name <- workspaces
@@ -29,21 +29,6 @@
           <th>Due Date
           <th class="span2">
       <tbody>
-        <tr>
-          <td>Develop "Hello World"
-          <td>2012-7-20
-          <td>
-            <a class="btn btn-danger" data-toggle="modal" href="#modal-pomodoro" data-backdrop="static" data-keyboard="false" onclick="Napolitan.startPomodoro()">Pomodoro
-        <tr>
-          <td>Test "Hello World"
-          <td>2012-7-21
-          <td>
-            <a class="btn btn-danger" data-toggle="modal" href="#modal-pomodoro" data-backdrop="static" data-keyboard="false" onclick="Napolitan.startPomodoro()">Pomodoro
-        <tr>
-          <td>Test "Hello World"
-          <td>2012-7-21
-          <td>
-            <a class="btn btn-danger" data-toggle="modal" href="#modal-pomodoro" data-backdrop="static" data-keyboard="false" onclick="Napolitan.startPomodoro()">Pomodoro
 
   <div class="modal hide" id="modal-pomodoro">
     <div class="modal-header">

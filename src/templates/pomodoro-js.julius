@@ -33,8 +33,9 @@ $(function() {
 
         var btn = $(document.createElement('a'));
         btn.attr('class', 'btn btn-danger');
-        btn.attr('href', '#modal-pomodoro');
+        btn.attr('href', '#');
         btn.text('Pomodoro');
+        btn.click(startPomodoro);
         var td3 = $(document.createElement('td'));
         td3.append(btn);
         tr.append(td3);
@@ -49,6 +50,10 @@ $(function() {
   $("#sync-tasks").click(syncWithAsana);
   $("#asana-workspaces").change(syncWithAsana);
 
+  var startPomodoro = function() {
+    $('#modal-pomodoro').modal({ backdrop: 'static', keyboard: false });
+  }
+
   $("#fieldAsanaKey").blur(function(event) {
     var field = $("#fieldAsanaKey");
     var key = field.val();
@@ -62,5 +67,8 @@ $(function() {
       });
     });
   });
+
+  // start sync-ing to display today's tasks
+  syncWithAsana();
 });
 
