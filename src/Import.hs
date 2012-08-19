@@ -15,9 +15,6 @@ module Import
 import Prelude hiding (writeFile, readFile, head, tail, init, last)
 import Yesod   hiding (Route(..))
 import Foundation
-import qualified Data.ByteString as S
-import qualified Data.ByteString.Lazy as L
-import Data.Maybe
 import Data.Monoid (Monoid (mappend, mempty, mconcat))
 import Control.Applicative ((<$>), (<*>), pure)
 import Data.Text (Text)
