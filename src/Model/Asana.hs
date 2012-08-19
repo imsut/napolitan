@@ -24,7 +24,7 @@ urlWorkspaces = "https://app.asana.com/api/1.0/workspaces"
 urlTasks :: Text -> String
 urlTasks workspaceId = "https://app.asana.com/api/1.0/workspaces/"
   ++ unpack workspaceId
-  ++ "/tasks?assignee=me&opt_fields=assignee_status,name,due_on,projects,projects.name"
+  ++ "/tasks?assignee=me&opt_fields=assignee_status,name,due_on,projects,projects.name,completed"
 
 data Workspace = Workspace { ident :: Text
                            , name :: Text
@@ -57,6 +57,7 @@ data Task = Task { taskId :: Text
                  , taskStatus :: Text
                  , projectName :: Maybe Text
                  , dueOn :: Maybe Text
+                 , completed :: Bool
                  } deriving Show
 
 instance FromJSON [Task] where
@@ -70,6 +71,7 @@ instance FromJSON [Task] where
                      <*> x .: "assignee_status"
                      <*> projectName x
                      <*> x .:? "due_on"
+                     <*> x .: "completed"
       projectName :: Object -> Parser (Maybe Text)
       projectName y = do
         projects <- y .: "projects"

@@ -56,7 +56,10 @@ getSyncR = do
     --     Just (Entity eid _) ->
     --       update eid [ AsanaConfigWorkspaces =. fmap A.persist wks ]
     --   mapM_ updateTask tasks
-    let json = toJSON (wks, A.filterByStatus "today" tasks)
+    let json = toJSON (
+          wks,
+          filter (\t -> (not $ A.completed t) && (A.taskStatus t == "today")) tasks
+          )
     jsonToRepJson json
   where
     updateTask t = do
