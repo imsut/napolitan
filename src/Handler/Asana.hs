@@ -38,6 +38,9 @@ getSyncR :: Handler RepJson
 getSyncR = do
     aid <- fromJust <$> maybeAuthId
     mwkid <- lookupGetParam "workspace"
+    case mwkid of
+      Nothing -> return ()
+      Just wkid -> setSession "workspaceId" wkid
     mkey <- do
       mrec <- runDB $ getBy $ UniqueConfigByUserId aid
       (return . Just . asanaConfigApiKey . entityVal . fromJust) mrec

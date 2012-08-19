@@ -2,6 +2,7 @@
 module Handler.Home where
 
 import Import
+import Data.Maybe (fromMaybe)
 import Yesod.Auth
 import qualified Yesod.Auth.OAuth as OA
 
@@ -16,7 +17,9 @@ getHomeR = do
       case mrec of
         Nothing -> redirect SettingsR -- need to set Asana API key
         Just (Entity _ (AsanaConfig _ _ wks)) -> do
+          mworkspace <- lookupSession "workspaceId"
           let workspaces = fmap unpersist wks
+              selectedWorkspace = fromMaybe "" mworkspace
           defaultLayout $ do
             setTitle "Pomodoro - Napolitan"
             $(widgetFile "pomodoro-js")

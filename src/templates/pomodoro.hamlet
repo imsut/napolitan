@@ -11,7 +11,10 @@
         \ 
         <select id="asana-workspaces">
           $forall Workspace ident name <- workspaces
-            <option value="#{ident}">#{name}
+            $if  selectedWorkspace == ident
+              <option value="#{ident}" selected="selected">#{name}
+            $else
+              <option value="#{ident}">#{name}
 
   <div class="modal hide" id="modal-sync">
     <div class="modal-body">
