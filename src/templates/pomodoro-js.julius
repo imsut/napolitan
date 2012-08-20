@@ -71,12 +71,11 @@ $(function() {
       $('#finish-' + type).text('Close');
       var audio = document.getElementById("audio-finish");
       audio.pause();
-      audio.currentTime = 0;
-//      audio.play();
+      audio.play();
     });
     timer.tick(function(restInMillis) {
-      var minutes = Math.floor(restInMillis / 60 / 1000);
-      var seconds = Math.floor((restInMillis % (60 * 1000)) / 1000);
+      var minutes = Math.max(0, Math.floor(restInMillis / 60 / 1000));
+      var seconds = Math.max(0, Math.floor((restInMillis % (60 * 1000)) / 1000));
       $('#' + type + '-timer').text(minutes + ":" + (seconds < 10 ? "0" + seconds : seconds));
     });
     timer.start();
@@ -90,7 +89,7 @@ $(function() {
   }
 
   var startPomodoro = function() {
-    startSession(3, 'pomodoro');
+    startSession(25 * 60, 'pomodoro');
   }
 
   var completeTask = function() {
