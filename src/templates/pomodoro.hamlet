@@ -29,9 +29,9 @@
           <th>Due Date
           <th class="span3">
       <tbody>
-        <tr>
-          <td>Develop "Hello World"
-          <td>2012-7-20
+        <tr id="task-0000" data-task-id="0000">
+          <td>Ship "Napolitan" beta1!
+          <td>2012-09-09
           <td>
             <div class="btn-toolbar no-margin">
               <div class="btn-group">
@@ -48,7 +48,7 @@
 
   <div class="modal hide" id="modal-pomodoro">
     <div class="modal-header">
-      <h3>Running Pomodoro...
+      <h3>Running Pomodoro
     <div class="modal-body">
       <p id="pomodoro-timer">25:00
     <div class="modal-footer">
@@ -86,8 +86,8 @@
           <th>Due Date</th>
       <tbody>
         <tr>
-          <td>Develop "Hello World"
-          <td>2012-7-20
+          <td>Added countdown timer
+          <td>2012-08-18
         <tr>
-          <td>Test "Hello World"
-          <td>2012-7-21
+          <td>Sync with Asana
+          <td>2012-07-29
