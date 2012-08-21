@@ -1,5 +1,8 @@
 // initialization
 $(function() {
+  var tasks_ = new Object();
+  var timer_ = null;
+
   var syncWithAsana = function() {
     $('#modal-sync').modal({ backdrop: 'static', keyboard: false });
   
@@ -17,47 +20,63 @@ $(function() {
       sel.val(ws);
 
       // update task list
-      $('#tasks tbody tr').remove();
-      var tasks = $('#tasks tbody');
+      tasks_ = new Object();
       $.each(data[1], function(idx, task) {
-        var tr = $(document.createElement('tr'));
-        tr.attr('id', 'task-' + task.id);
-        
-        var td1 = $(document.createElement('td'));
-        td1.text(task.name);
-        tr.append(td1);
-
-        var td2 = $(document.createElement('td'));
-        td2.text(task.due_on || "");
-        tr.append(td2);
-
-        var td3 = $(
-            '<td><div class="btn-toolbar no-margin">'
-          + '<div class="btn-group">'
-            + '<a class="btn btn-danger start-pomodoro" href="#">Pomodoro</a></div>'
-          + '<div class="btn-group">'
-            + '<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">Finish '
-            + '<span class="caret"></span></a>'
-            + '<ul class="dropdown-menu">'
-              + '<li><a href="#" class="complete-task">Complete Task</a></li>'
-              + '<li><a href="#" class="continue-tomorrow">Continue Tomorrow</a></li>'
-            + '</ul>'
-          + '</div></div></td>');
-        tr.append(td3);
-
-        tasks.append(tr);
+        tasks_['asana-' + task.id] = {
+          'id': task.id,
+          'name': task.name,
+          'due_on': task.due_on,
+        };
       });
-      $('#tasks tbody tr a.start-pomodoro').click(startPomodoro);
-      $('#tasks tbody tr a.complete-task').click(completeTask);
-      $('#tasks tbody tr a.continue-tomorrow').click(continueTomorrow);
-
+      updateTaskTable(tasks_);
+      
       $('#modal-sync').modal('hide');
     });
   }
 
-  var timer = null;
+  var updateTaskTable = function(tasks) {
+    $('#tasks tbody tr').remove();
+    var taskTable = $('#tasks tbody');
+    $.each(tasks, function(idx, task) {
+      var tr = $(document.createElement('tr'));
+      tr.attr('id', 'task-' + task.id);
+      tr.attr('data-task-id', task.id);
+      
+      var td1 = $(document.createElement('td'));
+      td1.text(task.name);
+      tr.append(td1);
+
+      var td2 = $(document.createElement('td'));
+      td2.text(task.due_on || "");
+      tr.append(td2);
+
+      var td3 = $(
+          '<td><div class="btn-toolbar no-margin">'
+        + '<div class="btn-group">'
+          + '<a class="btn btn-danger start-pomodoro" href="#">Pomodoro</a></div>'
+        + '<div class="btn-group">'
+          + '<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">Finish '
+          + '<span class="caret"></span></a>'
+          + '<ul class="dropdown-menu">'
+            + '<li><a href="#" class="complete-task">Complete Task</a></li>'
+            + '<li><a href="#" class="continue-tomorrow">Continue Tomorrow</a></li>'
+          + '</ul>'
+        + '</div></div></td>');
+      tr.append(td3);
+
+      taskTable.append(tr);
+    });
+    $('#tasks tbody tr a.start-pomodoro').click(startPomodoro);
+    $('#tasks tbody tr a.complete-task').click(completeTask);
+    $('#tasks tbody tr a.continue-tomorrow').click(continueTomorrow);
+  }
 
   var startSession = function(durationInSec, type) {
+    if (window.webkitNotifications &&
+      window.webkitNotifications.checkPermission() != 0) { // 0 is PERMISSION_ALLOWED
+      window.webkitNotifications.requestPermission();
+    }
+
     $('#finish-' + type).removeClass('btn-success').addClass('btn-danger')
     $('#finish-' + type).text('Abort');
     $('#modal-' + type).modal({ backdrop: 'static', keyboard: false });
@@ -65,30 +84,40 @@ $(function() {
     // Chrome wouldn't play sound without reloading.
     document.getElementById("audio-finish").load();
 
-    timer = new CountdownTimer(durationInSec);
-    timer.done(function() {
+    timer_ = new CountdownTimer(durationInSec);
+    timer_.done(function() {
       $('#finish-' + type).removeClass('btn-danger').addClass('btn-success')
       $('#finish-' + type).text('Close');
+
+      if (window.webkitNotifications &&
+          window.webkitNotifications.checkPermission() == 0) { // 0 is PERMISSION_ALLOWED
+        notification = createNotificationInstance(type);
+        notification.show();
+      }
+
+      // sound
       var audio = document.getElementById("audio-finish");
       audio.pause();
       audio.play();
     });
-    timer.tick(function(restInMillis) {
+    timer_.tick(function(restInMillis) {
       var minutes = Math.max(0, Math.floor(restInMillis / 60 / 1000));
       var seconds = Math.max(0, Math.floor((restInMillis % (60 * 1000)) / 1000));
       $('#' + type + '-timer').text(minutes + ":" + (seconds < 10 ? "0" + seconds : seconds));
     });
-    timer.start();
+    timer_.start();
   }
 
   var finishSession = function(type) {
-    if (timer) {
-      timer.stop();
+    if (timer_) {
+      timer_.stop();
     }
     $('#modal-' + type).modal('hide');
   }
 
-  var startPomodoro = function() {
+  var startPomodoro = function(evt) {
+    var taskId = $(evt.srcElement).parents('tr').first().attr('data-task-id');
+    $('#modal-pomodoro h3').text("Current Task: " + tasks_['asana-' + taskId].name);
     startSession(25 * 60, 'pomodoro');
   }
 
@@ -108,6 +137,20 @@ $(function() {
 
   var stopBreak = function() {
     finishSession('break');
+  }
+
+  var createNotificationInstance = function(type) {
+    if (type == 'pomodoro') {
+      return window.webkitNotifications.createNotification(
+        "/static/img/tomato-icon.32.png",
+        "Pomodoro finished",
+        "Well done!");
+    } else {
+      return window.webkitNotifications.createNotification(
+        "/static/img/tomato-icon.32.png",
+        "Break is over",
+        "Let's get back to work!");
+    }
   }
 
   var CountdownTimer = function(durationInSec) {
@@ -164,5 +207,9 @@ $(function() {
   // start sync-ing to display today's tasks
 //  syncWithAsana();
   $('#test').click(startPomodoro);
+  tasks_['asana-0000'] = {
+    'id': '0000',
+    'name': "Ship 'Napolitan' beta1!",
+    'due_on': null,
+  };
 });
-
