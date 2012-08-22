@@ -35,7 +35,7 @@
           <td>
             <div class="btn-toolbar no-margin">
               <div class="btn-group">
-                <a class="btn btn-danger" href="#" id="test">Pomodoro
+                <a class="btn btn-danger" href="#">Pomodoro
               <div class="btn-group">
                 <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
                   Finish #

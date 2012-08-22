@@ -3,7 +3,9 @@ $(function() {
   var tasks_ = new Object();
   var timer_ = null;
 
-  var syncWithAsana = function() {
+  var syncWithAsana = function(evt) {
+    evt.preventDefault();
+
     $('#modal-sync').modal({ backdrop: 'static', keyboard: false });
   
     var ws = $('#asana-workspaces').val();
@@ -116,26 +118,32 @@ $(function() {
   }
 
   var startPomodoro = function(evt) {
+    evt.preventDefault();
     var taskId = $(evt.srcElement).parents('tr').first().attr('data-task-id');
     $('#modal-pomodoro h3').text("Current Task: " + tasks_['asana-' + taskId].name);
     startSession(25 * 60, 'pomodoro');
   }
 
-  var completeTask = function() {
+  var completeTask = function(evt) {
+    evt.preventDefault();
   }
 
-  var continueTomorrow = function() {
+  var continueTomorrow = function(evt) {
+    evt.preventDefault();
   }
 
-  var finishPomodoro = function() {
+  var finishPomodoro = function(evt) {
+    evt.preventDefault();
     finishSession('pomodoro');
   }
 
-  var startBreak = function(durationInSec) {
+  var startBreak = function(durationInSec, evt) {
+    evt.preventDefault();
     startSession(durationInSec, 'break');
   }
 
-  var stopBreak = function() {
+  var stopBreak = function(evt) {
+    evt.preventDefault();
     finishSession('break');
   }
 
@@ -200,16 +208,18 @@ $(function() {
   $('#sync-tasks').click(syncWithAsana);
   $('#asana-workspaces').change(syncWithAsana);
   $('#finish-pomodoro').click(finishPomodoro);
-  $('#break-short').click(function() { startBreak(5 * 60); });
-  $('#break-long').click(function() { startBreak(20 * 60); });
+  $('#break-short').click(function(evt) { startBreak(5 * 60, evt); });
+  $('#break-long').click(function(evt) { startBreak(20 * 60, evt); });
   $('#finish-break').click(stopBreak);
 
   // start sync-ing to display today's tasks
 //  syncWithAsana();
-  $('#test').click(startPomodoro);
   tasks_['asana-0000'] = {
     'id': '0000',
     'name': "Ship 'Napolitan' beta1!",
     'due_on': null,
   };
+  $('#task-0000 a.btn-danger').click(startPomodoro);
+  $('#task-0000 li:first-child a').click(completeTask);
+  $('#task-0000 li:last-child a').click(continueTomorrow);
 });
