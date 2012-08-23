@@ -1,6 +1,7 @@
 // initialization
 $(function() {
   var tasks_ = new Object();
+  var finishedTasks_ = new Object();
   var timer_ = null;
 
   var syncWithAsana = function(evt) {
@@ -24,7 +25,7 @@ $(function() {
       // update task list
       tasks_ = new Object();
       $.each(data[1], function(idx, task) {
-        tasks_['asana-' + task.id] = {
+        tasks_[task.id] = {
           'id': task.id,
           'name': task.name,
           'due_on': task.due_on,
@@ -39,7 +40,9 @@ $(function() {
   var updateTaskTable = function(tasks) {
     $('#tasks tbody tr').remove();
     var taskTable = $('#tasks tbody');
+    var isEmpty = true;
     $.each(tasks, function(idx, task) {
+      isEmpty = false;
       var tr = $(document.createElement('tr'));
       tr.attr('id', 'task-' + task.id);
       tr.attr('data-task-id', task.id);
@@ -68,9 +71,60 @@ $(function() {
 
       taskTable.append(tr);
     });
+    if (isEmpty) {
+      var p = $(document.createElement('p'));
+      p.addClass("no-task");
+      p.text("No tasks left!");
+
+      var td1 = $(document.createElement('td'));
+      td1.attr("colspan", "3");
+      td1.append(p);
+
+      var tr = $(document.createElement('tr'));
+      tr.append(td1);
+      taskTable.append(tr);
+
+      return;
+    }
+
     $('#tasks tbody tr a.start-pomodoro').click(startPomodoro);
     $('#tasks tbody tr a.complete-task').click(completeTask);
     $('#tasks tbody tr a.continue-tomorrow').click(continueTomorrow);
+  }
+
+  var updateFinishedTaskTable = function(tasks) {
+    $('#finished-tasks tbody tr').remove();
+    var taskTable = $('#finished-tasks tbody');
+
+    var isEmpty = true;
+    $.each(tasks, function(idx, task) {
+      isEmpty = false;
+      var tr = $(document.createElement('tr'));
+      tr.attr('id', 'finished-task-' + task.id);
+      tr.attr('data-task-id', task.id);
+      
+      var td1 = $(document.createElement('td'));
+      td1.text(task.name);
+      tr.append(td1);
+
+      var td2 = $(document.createElement('td'));
+      td2.text(task.status || "");
+      tr.append(td2);
+
+      taskTable.append(tr);
+    });
+    if (isEmpty) {
+      var td1 = $(document.createElement('td'));
+      td1.attr("colspan", "2");
+      td1.addClass("no-task");
+      td1.text("No tasks finished...");
+
+      var tr = $(document.createElement('tr'));
+      tr.append(td1);
+      taskTable.append(tr);
+
+      return;
+    }
   }
 
   var startSession = function(durationInSec, type) {
@@ -117,23 +171,47 @@ $(function() {
     $('#modal-' + type).modal('hide');
   }
 
+  var getTaskId = function(evt) {
+    var trs = $(evt.srcElement).parents('tr');
+    if (trs.length > 0) {
+      return trs.first().attr('data-task-id');
+    }
+
+    return $('#modal-pomodoro').attr('data-task-id');
+  }
+
   var startPomodoro = function(evt) {
     evt.preventDefault();
-    var taskId = $(evt.srcElement).parents('tr').first().attr('data-task-id');
-    $('#modal-pomodoro h3').text("Current Task: " + tasks_['asana-' + taskId].name);
+    var taskId = getTaskId(evt);
+    $('#modal-pomodoro h3').text("Current Task: " + tasks_[taskId].name);
+    $('#modal-pomodoro').attr('data-task-id', taskId);
     startSession(25 * 60, 'pomodoro');
+  }
+
+  var finishTask = function(taskId, status) {
+    // move task from tasks_ to finishedTasks_
+    var t = tasks_[taskId];
+    t.status = status;
+    finishedTasks_[taskId] = t;
+    delete tasks_[taskId];
+
+    updateTaskTable(tasks_);
+    updateFinishedTaskTable(finishedTasks_);
   }
 
   var completeTask = function(evt) {
     evt.preventDefault();
+    finishTask(getTaskId(evt), "Complete");
   }
 
   var continueTomorrow = function(evt) {
     evt.preventDefault();
+    finishTask(getTaskId(evt), "Continue Tomorrow");
   }
 
   var finishPomodoro = function(evt) {
     evt.preventDefault();
+    $('#modal-pomodoro').removeAttr('data-task-id');
     finishSession('pomodoro');
   }
 
@@ -214,7 +292,7 @@ $(function() {
 
   // start sync-ing to display today's tasks
 //  syncWithAsana();
-  tasks_['asana-0000'] = {
+  tasks_['0000'] = {
     'id': '0000',
     'name': "Ship 'Napolitan' beta1!",
     'due_on': null,

@@ -83,11 +83,11 @@
       <thead>
         <tr>
           <th>Task
-          <th>Due Date</th>
+          <th>Status</th>
       <tbody>
         <tr>
           <td>Added countdown timer
-          <td>2012-08-18
+          <td>Completed
         <tr>
           <td>Sync with Asana
-          <td>2012-07-29
+          <td>Continue Tomorrow

@@ -560,6 +560,12 @@ body section:first-child {
 #tasks thead tr th {
 }
 
+p.no-task {
+  font-style: italic;
+  font-color: #999;
+  text-align: center;
+}
+
 #pomodoro-timer,
 #break-timer {
   height: 120px;
