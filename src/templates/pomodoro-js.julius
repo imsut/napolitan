@@ -251,12 +251,13 @@ $(function() {
 
   var stopBreak = function(evt) {
     evt.preventDefault();
-    finishSession('break');
 
-    break_['endAt'] = new Date().toISOString();
-    $.post('/break', break_, function(data) {
-      console.log(data);
-    });
+    if (!timer_.isRunning()) {
+      break_['endAt'] = new Date().toISOString();
+      $.post('/break', break_);
+    }
+
+    finishSession('break');
   }
 
   var dateString = function(date) {

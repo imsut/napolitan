@@ -6,6 +6,7 @@
 
 /            HomeR GET
 /pomodoro    PomodoroR POST
+/break       BreakR POST
 
 /stats/#Text StatsR GET
 /settings    SettingsR GET POST

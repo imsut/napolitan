@@ -150,6 +150,7 @@ instance Yesod App where
 
     -- route name, then a boolean indicating if it's a write request
     isAuthorized PomodoroR _ = isSignedIn
+    isAuthorized BreakR _ = isSignedIn
     isAuthorized SettingsR _ = isSignedIn
     isAuthorized (TasksR _) _ = isSignedIn
     isAuthorized WorkspacesR _ = isSignedIn
