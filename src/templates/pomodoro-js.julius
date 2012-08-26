@@ -2,7 +2,8 @@
 $(function() {
   var tasks_ = new Object();
   var finishedTasks_ = new Object();
-  var pomodoro = new Object();
+  var pomodoro_ = new Object();
+  var break_ = new Object();
   var timer_ = null;
 
   var syncWithAsana = function(evt) {
@@ -194,16 +195,12 @@ $(function() {
     var taskId = getTaskId(evt);
     var taskName = tasks_[taskId].name;
 
-    pomodoro['taskId'] = taskId;
-    pomodoro['taskName'] = taskName;
+    pomodoro_['taskId'] = taskId;
+    pomodoro_['taskName'] = taskName;
 
     var d = new Date();
-    var month = d.getMonth() + 1;
-    var date = d.getDate();
-    pomodoro['startOn'] = d.getFullYear() + "-"
-                        + (month < 10 ? ("0" + month) : month) + "-"
-                        + (date < 10 ? ("0" + date) : date);
-    pomodoro['startAt'] = d.toISOString();
+    pomodoro_['startOn'] = dateString(d);
+    pomodoro_['startAt'] = d.toISOString();
 
     $('#modal-pomodoro h3').text("Current Task: " + taskName);
     $('#modal-pomodoro').attr('data-task-id', taskId);
@@ -212,13 +209,14 @@ $(function() {
 
   var finishPomodoro = function(evt) {
     evt.preventDefault();
+
+    if (!timer_.isRunning()) {
+      pomodoro_['endAt'] = new Date().toISOString();
+      $.post('/pomodoro', pomodoro_);
+    }
+
     $('#modal-pomodoro').removeAttr('data-task-id');
     finishSession('pomodoro');
-
-    pomodoro['endAt'] = new Date().toISOString();
-    $.post('/pomodoro', pomodoro, function(data) {
-      console.log(data);
-    });
   }
 
   var finishTask = function(taskId, status) {
@@ -245,11 +243,28 @@ $(function() {
   var startBreak = function(durationInSec, evt) {
     evt.preventDefault();
     startSession(durationInSec, 'break');
+
+    var d = new Date();
+    break_['startOn'] = dateString(d);
+    break_['startAt'] = d.toISOString();
   }
 
   var stopBreak = function(evt) {
     evt.preventDefault();
     finishSession('break');
+
+    break_['endAt'] = new Date().toISOString();
+    $.post('/break', break_, function(data) {
+      console.log(data);
+    });
+  }
+
+  var dateString = function(date) {
+    var month = date.getMonth() + 1;
+    var day = date.getDate();
+    return date.getFullYear() + "-"
+      + (month < 10 ? ("0" + month) : month) + "-"
+      + (day < 10 ? ("0" + day) : day);
   }
 
   var createNotificationInstance = function(type) {
@@ -281,6 +296,10 @@ $(function() {
 
     stop: function() {
       this.enable = false;
+    },
+
+    isRunning: function() {
+      return this.endEpochTime > Date.now();
     },
 
     _tick: function() {
