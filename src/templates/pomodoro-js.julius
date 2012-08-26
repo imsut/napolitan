@@ -9,22 +9,26 @@ $(function() {
 
     $('#modal-sync').modal({ backdrop: 'static', keyboard: false });
   
-    var ws = $('#asana-workspaces').val();
-    $.getJSON('/sync/asana', { 'workspace': ws }, function(data) {
+    $.getJSON('/sync/asana/workspaces', function(data) {
       // update workspace list
       $('#asana-workspaces option').remove();
       var sel = $("#asana-workspaces");
-      $.each(data[0], function(idx, ws) {
+      $.each(data, function(idx, ws) {
         var opt = $(document.createElement('option'));
         opt.attr('value', ws.id);
         opt.text(ws.name);
         sel.append(opt);
       });
       sel.val(ws);
+    });
 
+    var ws = $('#asana-workspaces').val();
+    if (!ws) return;
+
+    $.getJSON('/sync/asana/tasks/' + ws, function(data) {
       // update task list
       tasks_ = new Object();
-      $.each(data[1], function(idx, task) {
+      $.each(data, function(idx, task) {
         tasks_[task.id] = {
           'id': task.id,
           'name': task.name,

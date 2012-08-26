@@ -1,6 +1,6 @@
 {-# LANGUAGE TupleSections, OverloadedStrings, FlexibleInstances #-}
-module Handler.Asana(getAsanaR,
-                     getSyncR
+module Handler.Asana(getWorkspacesR
+                    , getTasksR
                     ) where
 
 import Import
@@ -17,22 +17,7 @@ import Yesod.Auth (maybeAuthId)
 
 import DebugUtil
 
-getAsanaR :: Text -> Handler RepJson
-getAsanaR "workspaces" = do
-    aid <- fromJust <$> maybeAuthId
-    mkey <- lookupGetParam "key"
-    case mkey of
-      Nothing -> jsonToRepJson () >>= sendResponseStatus badRequest400
-      Just "" -> jsonToRepJson () >>= sendResponseStatus badRequest400
-      Just key -> do
-        wks <- liftIO $ A.getWorkspaces key
-        liftIO $ do
-          debugLog $ show key
-          debugLog $ show wks
-        jsonToRepJson $ M.fromList $ fmap (\a -> (A.ident a, A.name a)) wks
-getAsanaR _ = jsonToRepJson () >>= sendResponseStatus notFound404
-
--- only supports Asana now
+-- not used now.
 -- assumes AsanaConfig table has a record for this user
 getSyncR :: Handler RepJson
 getSyncR = do
@@ -76,3 +61,36 @@ getSyncR = do
 
     textToDay :: Text -> Maybe Day
     textToDay = F.parseTime defaultTimeLocale "%Y-%m-%d" . unpack
+
+-- assumes AsanaConfig table has a record for this user
+getWorkspacesR :: Handler RepJson
+getWorkspacesR = do
+    aid <- fromJust <$> maybeAuthId
+    mkey <- do
+      mrec <- runDB $ getBy $ UniqueConfigByUserId aid
+      (return . Just . asanaConfigApiKey . entityVal . fromJust) mrec
+    wks <- case mkey of
+      Nothing -> return []
+      Just key -> liftIO $ A.getWorkspaces key
+    runDB $ do
+      mrec <- getBy $ UniqueConfigByUserId aid
+      case mrec of
+        Nothing -> return ()
+        Just (Entity eid _) ->
+          update eid [ AsanaConfigWorkspaces =. fmap A.persist wks ]
+    let json = toJSON wks
+    jsonToRepJson json
+
+-- assumes AsanaConfig table has a record for this user
+getTasksR :: Text -> Handler RepJson
+getTasksR workspaceId = do
+    aid <- fromJust <$> maybeAuthId
+    setSession "workspaceId" workspaceId
+    mkey <- do
+      mrec <- runDB $ getBy $ UniqueConfigByUserId aid
+      (return . Just . asanaConfigApiKey . entityVal . fromJust) mrec
+    tasks <- case mkey of
+      Nothing -> return []
+      Just key -> liftIO $ A.getTasks key workspaceId
+    let json = toJSON $ filter (\t -> (not $ A.completed t) && (A.taskStatus t == "today")) tasks
+    jsonToRepJson json

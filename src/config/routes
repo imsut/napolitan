@@ -11,6 +11,7 @@
 /signup      SignupR GET
 /signout     SignoutR GET
 
-/sync/asana  SyncR GET
+/sync/asana/workspaces WorkspacesR GET
+/sync/asana/tasks/#Text             TasksR GET
 
-/proxy/asana/#Text AsanaR GET
+ -- /proxy/asana/#Text AsanaR GET
