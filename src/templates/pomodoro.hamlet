@@ -10,11 +10,11 @@
           \ Sync with Asana
         \ 
         <select id="asana-workspaces">
-          $forall Workspace ident name <- workspaces
-            $if  selectedWorkspace == ident
-              <option value="#{ident}" selected="selected">#{name}
+          $forall Workspace wsid wsname <- workspaces
+            $if  selectedWorkspace == wsid
+              <option value="#{wsid}" selected="selected">#{wsname}
             $else
-              <option value="#{ident}">#{name}
+              <option value="#{wsid}">#{wsname}
 
   <div class="modal hide" id="modal-sync">
     <div class="modal-body">

@@ -2,6 +2,7 @@
 $(function() {
   var tasks_ = new Object();
   var finishedTasks_ = new Object();
+  var pomodoro = new Object();
   var timer_ = null;
 
   var syncWithAsana = function(evt) {
@@ -112,7 +113,10 @@ $(function() {
       tr.append(td1);
 
       var td2 = $(document.createElement('td'));
-      td2.text(task.status || "");
+      if (task.status == "Complete")
+        td2.text("Complete");
+      else if (task.status == "Continue")
+        td2.text("Continue Tomorrow");
       tr.append(td2);
 
       taskTable.append(tr);
@@ -157,6 +161,7 @@ $(function() {
 
       // sound
       var audio = document.getElementById("audio-finish");
+      audio.volume = 0.1;
       audio.pause();
       audio.play();
     });
@@ -187,19 +192,43 @@ $(function() {
   var startPomodoro = function(evt) {
     evt.preventDefault();
     var taskId = getTaskId(evt);
-    $('#modal-pomodoro h3').text("Current Task: " + tasks_[taskId].name);
+    var taskName = tasks_[taskId].name;
+
+    pomodoro['taskId'] = taskId;
+    pomodoro['taskName'] = taskName;
+
+    var d = new Date();
+    var month = d.getMonth() + 1;
+    var date = d.getDate();
+    pomodoro['startOn'] = d.getFullYear() + "-"
+                        + (month < 10 ? ("0" + month) : month) + "-"
+                        + (date < 10 ? ("0" + date) : date);
+    pomodoro['startAt'] = d.toISOString();
+
+    $('#modal-pomodoro h3').text("Current Task: " + taskName);
     $('#modal-pomodoro').attr('data-task-id', taskId);
     startSession(25 * 60, 'pomodoro');
+  }
+
+  var finishPomodoro = function(evt) {
+    evt.preventDefault();
+    $('#modal-pomodoro').removeAttr('data-task-id');
+    finishSession('pomodoro');
+
+    pomodoro['endAt'] = new Date().toISOString();
+    $.post('/pomodoro', pomodoro, function(data) {
+      console.log(data);
+    });
   }
 
   var finishTask = function(taskId, status) {
     // move task from tasks_ to finishedTasks_
     var t = tasks_[taskId];
     t.status = status;
-    finishedTasks_[taskId] = t;
     delete tasks_[taskId];
-
     updateTaskTable(tasks_);
+
+    finishedTasks_[taskId] = t;
     updateFinishedTaskTable(finishedTasks_);
   }
 
@@ -210,13 +239,7 @@ $(function() {
 
   var continueTomorrow = function(evt) {
     evt.preventDefault();
-    finishTask(getTaskId(evt), "Continue Tomorrow");
-  }
-
-  var finishPomodoro = function(evt) {
-    evt.preventDefault();
-    $('#modal-pomodoro').removeAttr('data-task-id');
-    finishSession('pomodoro');
+    finishTask(getTaskId(evt), "Continue");
   }
 
   var startBreak = function(durationInSec, evt) {

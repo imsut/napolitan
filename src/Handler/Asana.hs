@@ -50,17 +50,17 @@ getSyncR = do
           )
     jsonToRepJson json
   where
-    updateTask t = do
-      mrec <- getBy $ UniqueTaskByExtId $ A.taskId t
-      case mrec of
-        Nothing -> insert $ Task (A.taskId t) (A.taskName t) (A.dueOn t >>= textToDay)
-        Just (Entity eid _) -> do
-          update eid [ TaskName =. (A.taskName t)
-                     , TaskDueOn =. (A.dueOn t >>= textToDay) ]
-          return eid
+    -- updateTask t = do
+    --   mrec <- getBy $ UniqueTaskByExtId $ A.taskId t
+    --   case mrec of
+    --     Nothing -> insert $ Task (A.taskId t) (A.taskName t) (A.dueOn t >>= textToDay)
+    --     Just (Entity eid _) -> do
+    --       update eid [ TaskName =. (A.taskName t)
+    --                  , TaskDueOn =. (A.dueOn t >>= textToDay) ]
+    --       return eid
 
-    textToDay :: Text -> Maybe Day
-    textToDay = F.parseTime defaultTimeLocale "%Y-%m-%d" . unpack
+    -- textToDay :: Text -> Maybe Day
+    -- textToDay = F.parseTime defaultTimeLocale "%Y-%m-%d" . unpack
 
 -- assumes AsanaConfig table has a record for this user
 getWorkspacesR :: Handler RepJson

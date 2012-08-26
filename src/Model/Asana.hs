@@ -1,12 +1,11 @@
 {-# LANGUAGE TupleSections, OverloadedStrings, FlexibleInstances, ImplicitPrelude #-}
-module Model.Asana (Workspace(..),
-                    PersistWorkspace,
-                    Task(..),
-                    persist,
-                    unpersist,
-                    getWorkspaces,
-                    getTasks,
-                    filterByStatus
+module Model.Asana (Workspace(..)
+                   , PersistWorkspace
+                   , Task(..)
+                   , persist
+                   , unpersist
+                   , getWorkspaces
+                   , getTasks
                    ) where
 
 import Control.Applicative ((<$>), (<*>))
@@ -107,7 +106,3 @@ getTasks key workspaceId = do
       Just workspaces -> return workspaces
   where
     req = C.applyBasicAuth (E.encodeUtf8 key) "" $ fromJust $ C.parseUrl $ urlTasks workspaceId
-
--- filter tasks by "assignee_status", which takes one of "inbox", "today", "upcoming", and "later"
-filterByStatus :: Text -> [Task] -> [Task]
-filterByStatus status = filter (\t -> status == taskStatus t)

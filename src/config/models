@@ -13,25 +13,25 @@ AsanaConfig
     UniqueConfigByUserId userId
     deriving Show
 
-Task
-    externalId Text
-    name Text
-    dueOn Day Maybe
-    UniqueTaskByExtId externalId
-    deriving Show
-
 Pomodoro
     startOn Day
     startAt UTCTime
     endAt UTCTime
     taskId Text
-    taskStatus Text
+    taskName Text
     deriving Show
 
 Break
     startOn Day
     startAt UTCTime
     endAt UTCTime
+    deriving Show
+
+FinishedTask
+    externalId Text
+    name Text
+    status Text
+    UniqueTaskByExtId externalId
     deriving Show
 
  -- By default this file is used in Model.hs (which is imported by Foundation.hs)

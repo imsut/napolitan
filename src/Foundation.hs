@@ -149,6 +149,7 @@ instance Yesod App where
     jsLoader _ = BottomOfBody
 
     -- route name, then a boolean indicating if it's a write request
+    isAuthorized PomodoroR _ = isSignedIn
     isAuthorized SettingsR _ = isSignedIn
     isAuthorized (TasksR _) _ = isSignedIn
     isAuthorized WorkspacesR _ = isSignedIn

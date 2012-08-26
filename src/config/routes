@@ -5,6 +5,8 @@
 /robots.txt  RobotsR GET
 
 /            HomeR GET
+/pomodoro    PomodoroR POST
+
 /stats/#Text StatsR GET
 /settings    SettingsR GET POST
 
