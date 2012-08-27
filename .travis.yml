@@ -1,7 +1,6 @@
 language: haskell
-before_script:
-  - psql -c 'create database napolitan_test;' -U postgres
 before_install:
+  - psql -c 'create database napolitan_test;' -U postgres
   - "cd src"
   - "mv config/settings.travis.yml config/settings.yml"
   - "mv config/postgresql.travis.yml config/postgresql.yml"
