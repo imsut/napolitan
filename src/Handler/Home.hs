@@ -59,7 +59,7 @@ getHomeR = do
             $(widgetFile "pomodoro-js")
             $(widgetFile "pomodoro")
     Nothing -> defaultLayout $ do
-      setTitle "Napolitan = Asana + Pomorodo"
+      setTitle "Napolitan = Asana + Pomodoro"
       $(widgetFile "welcome")
 
 postPomodoroR :: Handler RepJson
