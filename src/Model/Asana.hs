@@ -97,23 +97,17 @@ instance ToJSON Task where
 
 getWorkspaces :: Text -> IO [Workspace]
 getWorkspaces key = do
-    resp <- C.withManager $ \m ->
-      C.httpLbs req m
+    resp <- C.withManager $ \m -> C.httpLbs (makeRequest key urlWorkspaces) m
     case decode $ C.responseBody resp of
       Nothing -> return []
       Just workspaces -> return workspaces
-  where
-    req = C.applyBasicAuth (E.encodeUtf8 key) "" $ fromJust $ C.parseUrl urlWorkspaces
 
 getTasks :: Text -> Text -> IO [Task]
 getTasks key workspaceId = do
-    resp <- C.withManager $ \m ->
-      C.httpLbs req m
+    resp <- C.withManager $ \m -> C.httpLbs (makeRequest key $ urlTasks workspaceId) m
     case decode $ C.responseBody resp of
       Nothing -> return []
       Just tasks -> return tasks
-  where
-    req = C.applyBasicAuth (E.encodeUtf8 key) "" $ fromJust $ C.parseUrl $ urlTasks workspaceId
 
 completeTask :: Text -> Text -> IO ()
 completeTask = updateTask [("completed", "true")]
@@ -126,5 +120,7 @@ updateTask params key taskId = do
     _ <- C.withManager $ \m -> C.httpLbs req m
     return ()
   where
-    req = C.applyBasicAuth (E.encodeUtf8 key) ""
-          $ (C.urlEncodedBody params $ fromJust $ C.parseUrl $ urlTask taskId) { C.method = "PUT" }
+    req = (C.urlEncodedBody params (makeRequest key $ urlTask taskId)) { C.method = "PUT" }
+
+makeRequest :: Text -> String -> C.Request m
+makeRequest key url = (C.applyBasicAuth (E.encodeUtf8 key) "" . fromJust . C.parseUrl) $ url
