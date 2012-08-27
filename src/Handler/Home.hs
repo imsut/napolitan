@@ -1,7 +1,8 @@
 {-# LANGUAGE TupleSections, OverloadedStrings #-}
 module Handler.Home (getHomeR
                     , postPomodoroR
-                    , postBreakR) where
+                    , postBreakR
+                    , postTaskR) where
 
 import Import
 import Data.Maybe (fromMaybe, fromJust)
@@ -32,6 +33,14 @@ breakForm currentTime = Break
       <$> ireq dayField "startOn"
       <*> (textToUTCTime currentTime) `fmap` ireq textField "startAt"
       <*> (textToUTCTime currentTime) `fmap` ireq textField "endAt"
+
+taskForm :: UTCTime -> FormInput App App FinishedTask
+taskForm currentTime = FinishedTask
+      <$> ireq dayField "finishOn"
+      <*> (textToUTCTime currentTime) `fmap` ireq textField "finishAt"
+      <*> ireq textField "ident"
+      <*> ireq textField "name"
+      <*> ireq textField "status"
 
 getHomeR :: Handler RepHtml
 getHomeR = do
@@ -68,3 +77,20 @@ postBreakR = do
   liftIO $ debugLog $ show break
   _ <- runDB $ insert break
   jsonToRepJson ()
+
+postTaskR :: Handler RepJson
+postTaskR = do
+  aid <- fromJust <$> maybeAuthId
+  utcTime <- liftIO $ getCurrentTime
+  task <- runInputPost $ taskForm utcTime
+  liftIO $ debugLog $ show task
+  mrec <- runDB $ getBy $ UniqueConfigByUserId aid
+  case mrec of
+    Nothing -> redirect SettingsR -- need to set Asana API key
+    Just (Entity _ (AsanaConfig _ key _)) -> do
+      _ <- runDB $ insert task
+      liftIO $ case task of
+        FinishedTask _ _ taskId _ "Complete" -> completeTask key taskId
+        FinishedTask _ _ taskId _ "Continue" -> interruptTask key taskId
+        _ -> return () -- should return 300
+      jsonToRepJson ()

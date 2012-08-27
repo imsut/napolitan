@@ -28,10 +28,11 @@ Break
     deriving Show
 
 FinishedTask
-    externalId Text
+    finishOn Day
+    finishAt UTCTime
+    ident Text
     name Text
     status Text
-    UniqueTaskByExtId externalId
     deriving Show
 
  -- By default this file is used in Model.hs (which is imported by Foundation.hs)

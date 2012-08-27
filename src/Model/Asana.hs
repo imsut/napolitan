@@ -6,15 +6,20 @@ module Model.Asana (Workspace(..)
                    , unpersist
                    , getWorkspaces
                    , getTasks
+                   , completeTask
+                   , interruptTask
                    ) where
 
 import Control.Applicative ((<$>), (<*>))
 import Data.Aeson
 import Data.Aeson.Types
+import qualified Data.ByteString as S
 import Data.Maybe
 import Data.Text (Text, pack, unpack)
 import qualified Data.Text.Encoding as E
+import DebugUtil
 import qualified Network.HTTP.Conduit as C
+import qualified Network.HTTP.Types as T
 
 urlWorkspaces :: String
 urlWorkspaces = "https://app.asana.com/api/1.0/workspaces"
@@ -24,6 +29,9 @@ urlTasks :: Text -> String
 urlTasks workspaceId = "https://app.asana.com/api/1.0/workspaces/"
   ++ unpack workspaceId
   ++ "/tasks?assignee=me&opt_fields=assignee_status,name,due_on,projects,projects.name,completed"
+
+urlTask :: Text -> String
+urlTask taskId = "https://app.asana.com/api/1.0/tasks/" ++ unpack taskId
 
 data Workspace = Workspace { ident :: Text
                            , name :: Text
@@ -103,6 +111,20 @@ getTasks key workspaceId = do
       C.httpLbs req m
     case decode $ C.responseBody resp of
       Nothing -> return []
-      Just workspaces -> return workspaces
+      Just tasks -> return tasks
   where
     req = C.applyBasicAuth (E.encodeUtf8 key) "" $ fromJust $ C.parseUrl $ urlTasks workspaceId
+
+completeTask :: Text -> Text -> IO ()
+completeTask = updateTask [("completed", "true")]
+
+interruptTask :: Text -> Text -> IO ()
+interruptTask = updateTask [("assignee_status", "upcoming")]
+
+updateTask :: [(S.ByteString, S.ByteString)] -> Text -> Text -> IO ()
+updateTask params key taskId = do
+    _ <- C.withManager $ \m -> C.httpLbs req m
+    return ()
+  where
+    req = C.applyBasicAuth (E.encodeUtf8 key) ""
+          $ (C.urlEncodedBody params $ fromJust $ C.parseUrl $ urlTask taskId) { C.method = "PUT" }

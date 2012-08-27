@@ -7,7 +7,7 @@ $(function() {
   var timer_ = null;
 
   var syncWithAsana = function(evt) {
-    evt.preventDefault();
+    if (evt) evt.preventDefault();
 
     $('#modal-sync').modal({ backdrop: 'static', keyboard: false });
   
@@ -226,8 +226,17 @@ $(function() {
     delete tasks_[taskId];
     updateTaskTable(tasks_);
 
-    finishedTasks_[taskId] = t;
-    updateFinishedTaskTable(finishedTasks_);
+    var task = new Object();
+    var d = new Date();
+    task['finishOn'] = dateString(d);
+    task['finishAt'] = d.toISOString();
+    task['ident'] = taskId;
+    task['name'] = t.name;
+    task['status'] = status;
+    $.post('/task', task, function(data) {
+      finishedTasks_[taskId] = t;
+      updateFinishedTaskTable(finishedTasks_);
+    });
   }
 
   var completeTask = function(evt) {
@@ -338,7 +347,8 @@ $(function() {
   $('#finish-break').click(stopBreak);
 
   // start sync-ing to display today's tasks
-//  syncWithAsana();
+  syncWithAsana();
+/*
   tasks_['0000'] = {
     'id': '0000',
     'name': "Ship 'Napolitan' beta1!",
@@ -347,4 +357,5 @@ $(function() {
   $('#task-0000 a.btn-danger').click(startPomodoro);
   $('#task-0000 li:first-child a').click(completeTask);
   $('#task-0000 li:last-child a').click(continueTomorrow);
+*/
 });
