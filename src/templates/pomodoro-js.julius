@@ -5,6 +5,7 @@ $(function() {
   var pomodoro_ = new Object();
   var break_ = new Object();
   var timer_ = null;
+  var titleBlinker_ = null;
 
   var syncWithAsana = function(evt) {
     if (evt) evt.preventDefault();
@@ -157,8 +158,19 @@ $(function() {
       if (window.webkitNotifications &&
           window.webkitNotifications.checkPermission() == 0) { // 0 is PERMISSION_ALLOWED
         notification = createNotificationInstance(type);
+        notification.onclick = function() {
+          notification.cancel();
+        };
         notification.show();
       }
+
+      // start blinking title
+      if (type == "pomodoro") {
+        titleBlinker_ = new TitleBlinker(["Pomodoro", "DONE!!!"]);
+      } else {
+        titleBlinker_ = new TitleBlinker(["Break is", "OVER!!!"]);
+      }
+      titleBlinker_.start();
 
       // sound
       var audio = document.getElementById("audio-finish");
@@ -177,6 +189,11 @@ $(function() {
   var finishSession = function(type) {
     if (timer_) {
       timer_.stop();
+      timer_ = null;
+    }
+    if (titleBlinker_) {
+      titleBlinker_.stop();
+      titleBlinker_ = null;
     }
     $('#modal-' + type).modal('hide');
   }
@@ -289,7 +306,7 @@ $(function() {
         "Break is over",
         "Let's get back to work!");
     }
-  }
+  };
 
   var CountdownTimer = function(durationInSec) {
     this.endEpochTime = Date.now() + durationInSec * 1000;
@@ -325,8 +342,8 @@ $(function() {
         return;
       }
 
-      var thisObj = this;
-      setTimeout(function() { thisObj._tick.call(thisObj); }, 1000);
+      var self = this;
+      setTimeout(function() { self._tick.call(self); }, 1000);
     },
 
     done: function(callback) {
@@ -336,6 +353,33 @@ $(function() {
     tick: function(callback) {
       this.callbackOnTick = callback;
     },
+  };
+
+  var TitleBlinker = function(texts) {
+    this.texts = texts;
+    this.originalText = $('title').text();
+    this.enable = false;
+    this.counter = 0;
+  };
+
+  TitleBlinker.prototype = {
+    start: function() {
+      this.enable = true;
+      this._tick();
+    },
+
+    stop: function() {
+      this.enable = false;
+      $('title').text(this.originalText);
+    },
+
+    _tick: function() {
+      if (!this.enable) return;
+      $('title').text(this.texts[this.counter]);
+      this.counter = (this.counter + 1) % this.texts.length;
+      var self = this;
+      setTimeout(function() { self._tick.call(self); }, 1000);
+    }
   };
 
   // bind events to event handlers
