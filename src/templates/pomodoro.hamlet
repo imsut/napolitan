@@ -28,6 +28,14 @@
           <th>Task
           <th>Due Date
           <th class="span3">
+      <tfoot>
+        <tr>
+          <td>Small tasks
+          <td>
+          <td>
+            <div class="btn-toolbar no-margin">
+              <div class="btn-group">
+                <a class="btn btn-danger" href="#">Pomodoro
       <tbody>
         <tr id="task-0000" data-task-id="0000">
           <td>Ship "Napolitan" beta1!

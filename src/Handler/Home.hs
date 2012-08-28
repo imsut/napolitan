@@ -25,8 +25,8 @@ pomodoroForm currentTime = Pomodoro
       <$> ireq dayField "startOn"
       <*> (textToUTCTime currentTime) `fmap` ireq textField "startAt"
       <*> (textToUTCTime currentTime) `fmap` ireq textField "endAt"
-      <*> ireq textField "taskId"
-      <*> ireq textField "taskName"
+      <*> iopt textField "taskId"
+      <*> iopt textField "taskName"
 
 breakForm :: UTCTime -> FormInput App App Break
 breakForm currentTime = Break

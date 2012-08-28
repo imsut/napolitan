@@ -210,17 +210,22 @@ $(function() {
   var startPomodoro = function(evt) {
     evt.preventDefault();
     var taskId = getTaskId(evt);
-    var taskName = tasks_[taskId].name;
+    if (taskId) {
+      var taskName = tasks_[taskId].name;
+      pomodoro_['taskId'] = taskId;
+      pomodoro_['taskName'] = taskName;
 
-    pomodoro_['taskId'] = taskId;
-    pomodoro_['taskName'] = taskName;
+      $('#modal-pomodoro h3').text("Current Task: " + taskName);
+      $('#modal-pomodoro').attr('data-task-id', taskId);
+    } else {
+      $('#modal-pomodoro h3').text('Running Pomodoro');
+      $('#modal-pomodoro').removeAttr('data-task-id');
+    }
 
     var d = new Date();
     pomodoro_['startOn'] = dateString(d);
     pomodoro_['startAt'] = d.toISOString();
 
-    $('#modal-pomodoro h3').text("Current Task: " + taskName);
-    $('#modal-pomodoro').attr('data-task-id', taskId);
     startSession(25 * 60, 'pomodoro');
   }
 
@@ -386,6 +391,7 @@ $(function() {
   $('#sync-tasks').click(syncWithAsana);
   $('#asana-workspaces').change(syncWithAsana);
   $('#finish-pomodoro').click(finishPomodoro);
+  $('#tasks tfoot a').click(startPomodoro);
   $('#break-short').click(function(evt) { startBreak(5 * 60, evt); });
   $('#break-long').click(function(evt) { startBreak(20 * 60, evt); });
   $('#finish-break').click(stopBreak);

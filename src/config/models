@@ -17,8 +17,8 @@ Pomodoro
     startOn Day
     startAt UTCTime
     endAt UTCTime
-    taskId Text
-    taskName Text
+    taskId Text Maybe
+    taskName Text Maybe
     deriving Show
 
 Break
