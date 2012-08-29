@@ -145,7 +145,7 @@ $(function() {
 
     $('#finish-' + type).removeClass('btn-success').addClass('btn-danger')
     $('#finish-' + type).text('Abort');
-    if (!pomodoro_['taskId']) {
+    if (!pomodoro_.taskId) {
       $('#finish-task-btns').hide();
     }
     $('#modal-' + type).modal({ backdrop: 'static', keyboard: false });
@@ -230,8 +230,8 @@ $(function() {
     var taskId = getTaskId(evt);
     if (taskId) {
       var taskName = tasks_[taskId].name;
-      pomodoro_['taskId'] = taskId;
-      pomodoro_['taskName'] = taskName;
+      pomodoro_.taskId = taskId;
+      pomodoro_.taskName = taskName;
 
       $('#modal-pomodoro h3').text("Current Task: " + taskName);
       $('#modal-pomodoro').attr('data-task-id', taskId);
@@ -241,8 +241,8 @@ $(function() {
     }
 
     var d = new Date();
-    pomodoro_['startOn'] = dateString(d);
-    pomodoro_['startAt'] = d.toISOString();
+    pomodoro_.startOn = dateString(d);
+    pomodoro_.startAt = d.toISOString();
 
     startSession(25 * 60, 'pomodoro');
   }
@@ -251,7 +251,7 @@ $(function() {
     evt.preventDefault();
 
     if (pomodoro_.complete) {
-      pomodoro_['endAt'] = new Date().toISOString();
+      pomodoro_.endAt = new Date().toISOString();
       $.post('/pomodoro', pomodoro_);
     }
 
@@ -268,11 +268,11 @@ $(function() {
 
     var task = new Object();
     var d = new Date();
-    task['finishOn'] = dateString(d);
-    task['finishAt'] = d.toISOString();
-    task['ident'] = taskId;
-    task['name'] = t.name;
-    task['status'] = status;
+    task.finishOn = dateString(d);
+    task.finishAt = d.toISOString();
+    task.ident = taskId;
+    task.name = t.name;
+    task.status = status;
     $.post('/task', task, function(data) {
       finishedTasks_[taskId] = t;
       updateFinishedTaskTable(finishedTasks_);
@@ -312,15 +312,15 @@ $(function() {
     startSession(durationInSec, 'break');
 
     var d = new Date();
-    break_['startOn'] = dateString(d);
-    break_['startAt'] = d.toISOString();
+    break_.startOn = dateString(d);
+    break_.startAt = d.toISOString();
   }
 
   var stopBreak = function(evt) {
     evt.preventDefault();
 
     if (!timer_.isRunning()) {
-      break_['endAt'] = new Date().toISOString();
+      break_.endAt = new Date().toISOString();
       $.post('/break', break_);
     }
 
