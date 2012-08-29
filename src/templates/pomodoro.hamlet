@@ -60,9 +60,9 @@
     <div class="modal-body">
       <p id="pomodoro-timer">25:00
     <div class="modal-footer">
-      <div class="btn-group pull-left">
-        <a href="#" class="btn complete-task">Complete Task
-        <a href="#" class="btn continue-tomorrow">Continue Tomorrow
+      <div id="finish-task-btns" class="btn-group pull-left">
+        <a href="#" class="btn">Complete Task
+        <a href="#" class="btn">Continue Tomorrow
       <a id="finish-pomodoro" href="#" class="btn btn-danger">Abort
 
   <div class="row">

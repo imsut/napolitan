@@ -2,7 +2,7 @@
 $(function() {
   var tasks_ = new Object();
   var finishedTasks_ = new Object();
-  var pomodoro_ = new Object();
+  var pomodoro_ = null;
   var break_ = new Object();
   var timer_ = null;
   var titleBlinker_ = null;
@@ -145,15 +145,31 @@ $(function() {
 
     $('#finish-' + type).removeClass('btn-success').addClass('btn-danger')
     $('#finish-' + type).text('Abort');
+    if (!pomodoro_['taskId']) {
+      $('#finish-task-btns').hide();
+    }
     $('#modal-' + type).modal({ backdrop: 'static', keyboard: false });
 
     // Chrome wouldn't play sound without reloading.
     document.getElementById("audio-finish").load();
 
+    // instanciate TitleBlinker here to save original title
+    if (type == "pomodoro") {
+      titleBlinker_ = new TitleBlinker(["Pomodoro", "DONE!!!"]);
+    } else {
+      titleBlinker_ = new TitleBlinker(["Break is", "OVER!!!"]);
+    }
+
     timer_ = new CountdownTimer(durationInSec);
     timer_.done(function() {
+      pomodoro_.complete = true;
+
+      // toggle button text and color
       $('#finish-' + type).removeClass('btn-danger').addClass('btn-success')
       $('#finish-' + type).text('Close');
+
+      // start blinking title
+      titleBlinker_.start();
 
       if (window.webkitNotifications &&
           window.webkitNotifications.checkPermission() == 0) { // 0 is PERMISSION_ALLOWED
@@ -164,14 +180,6 @@ $(function() {
         notification.show();
       }
 
-      // start blinking title
-      if (type == "pomodoro") {
-        titleBlinker_ = new TitleBlinker(["Pomodoro", "DONE!!!"]);
-      } else {
-        titleBlinker_ = new TitleBlinker(["Break is", "OVER!!!"]);
-      }
-      titleBlinker_.start();
-
       // sound
       var audio = document.getElementById("audio-finish");
       audio.volume = 0.1;
@@ -181,7 +189,9 @@ $(function() {
     timer_.tick(function(restInMillis) {
       var minutes = Math.max(0, Math.floor(restInMillis / 60 / 1000));
       var seconds = Math.max(0, Math.floor((restInMillis % (60 * 1000)) / 1000));
-      $('#' + type + '-timer').text(minutes + ":" + (seconds < 10 ? "0" + seconds : seconds));
+      var time = minutes + ":" + (seconds < 10 ? "0" + seconds : seconds)
+      $('#' + type + '-timer').text(time);
+      $('title').text(time);
     });
     timer_.start();
   }
@@ -198,6 +208,10 @@ $(function() {
     $('#modal-' + type).modal('hide');
   }
 
+  var isModalShown = function() {
+    return timer_;
+  }
+
   var getTaskId = function(evt) {
     var trs = $(evt.srcElement).parents('tr');
     if (trs.length > 0) {
@@ -209,6 +223,10 @@ $(function() {
 
   var startPomodoro = function(evt) {
     evt.preventDefault();
+
+    pomodoro_ = new Object();
+    pomodoro_.complete = false;
+
     var taskId = getTaskId(evt);
     if (taskId) {
       var taskName = tasks_[taskId].name;
@@ -232,7 +250,7 @@ $(function() {
   var finishPomodoro = function(evt) {
     evt.preventDefault();
 
-    if (!timer_.isRunning()) {
+    if (pomodoro_.complete) {
       pomodoro_['endAt'] = new Date().toISOString();
       $.post('/pomodoro', pomodoro_);
     }
@@ -261,14 +279,32 @@ $(function() {
     });
   }
 
+  var completeTaskAndFinishPomodoro = function(evt) {
+    evt.preventDefault();
+
+    pomodoro_.complete = true;
+    completeTask(evt);
+    finishPomodoro(evt);
+  }
+
   var completeTask = function(evt) {
     evt.preventDefault();
     finishTask(getTaskId(evt), "Complete");
+
+    if (isModalShown()) {
+      pomodoro_.complete = true;
+      finishPomodoro(evt);
+    }
   }
 
   var continueTomorrow = function(evt) {
     evt.preventDefault();
     finishTask(getTaskId(evt), "Continue");
+
+    if (isModalShown()) {
+      pomodoro_.complete = true;
+      finishPomodoro(evt);
+    }
   }
 
   var startBreak = function(durationInSec, evt) {
@@ -390,6 +426,8 @@ $(function() {
   // bind events to event handlers
   $('#sync-tasks').click(syncWithAsana);
   $('#asana-workspaces').change(syncWithAsana);
+  $('#finish-task-btns a:first-child').click(completeTask);
+  $('#finish-task-btns a:last-child').click(continueTomorrow);
   $('#finish-pomodoro').click(finishPomodoro);
   $('#tasks tfoot a').click(startPomodoro);
   $('#break-short').click(function(evt) { startBreak(5 * 60, evt); });
