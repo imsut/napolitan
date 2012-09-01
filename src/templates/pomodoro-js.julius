@@ -1,7 +1,6 @@
 // initialization
 $(function() {
   var tasks_ = new Object();
-  var finishedTasks_ = new Object();
   var pomodoro_ = null;
   var break_ = new Object();
   var timer_ = null;
@@ -39,9 +38,12 @@ $(function() {
         };
       });
       updateTaskTable(tasks_);
+      $('#num-undone').text($(data).length);
       
       $('#modal-sync').modal('hide');
     });
+
+    updateFinishedTasks();
   }
 
   var updateTaskTable = function(tasks) {
@@ -97,44 +99,6 @@ $(function() {
     $('#tasks tbody tr a.start-pomodoro').click(startPomodoro);
     $('#tasks tbody tr a.complete-task').click(completeTask);
     $('#tasks tbody tr a.continue-tomorrow').click(continueTomorrow);
-  }
-
-  var updateFinishedTaskTable = function(tasks) {
-    $('#finished-tasks tbody tr').remove();
-    var taskTable = $('#finished-tasks tbody');
-
-    var isEmpty = true;
-    $.each(tasks, function(idx, task) {
-      isEmpty = false;
-      var tr = $(document.createElement('tr'));
-      tr.attr('id', 'finished-task-' + task.id);
-      tr.attr('data-task-id', task.id);
-      
-      var td1 = $(document.createElement('td'));
-      td1.text(task.name);
-      tr.append(td1);
-
-      var td2 = $(document.createElement('td'));
-      if (task.status == "Complete")
-        td2.text("Complete");
-      else if (task.status == "Continue")
-        td2.text("Continue Tomorrow");
-      tr.append(td2);
-
-      taskTable.append(tr);
-    });
-    if (isEmpty) {
-      var td1 = $(document.createElement('td'));
-      td1.attr("colspan", "2");
-      td1.addClass("no-task");
-      td1.text("No tasks finished...");
-
-      var tr = $(document.createElement('tr'));
-      tr.append(td1);
-      taskTable.append(tr);
-
-      return;
-    }
   }
 
   var startSession = function(durationInSec, type) {
@@ -260,7 +224,6 @@ $(function() {
   }
 
   var finishTask = function(taskId, status) {
-    // move task from tasks_ to finishedTasks_
     var t = tasks_[taskId];
     t.status = status;
     delete tasks_[taskId];
@@ -274,17 +237,26 @@ $(function() {
     task.name = t.name;
     task.status = status;
     $.post('/task', task, function(data) {
-      finishedTasks_[taskId] = t;
-      updateFinishedTaskTable(finishedTasks_);
+      updateFinishedTasks();
     });
   }
 
-  var completeTaskAndFinishPomodoro = function(evt) {
-    evt.preventDefault();
+  var updateFinishedTasks = function() {
+    var today = dateString(new Date());
+    $.getJSON('/stats/' + screenName + '/' + today, function(data) {
+      var numComplete = 0;
+      var numContinue = 0;
+      $.each(data, function(idx, task) {
+        if (task.status == 'Complete') {
+          numComplete++;
+        } else if (task.status == 'Continue') {
+          numContinue++;
+        }
+      });
 
-    pomodoro_.complete = true;
-    completeTask(evt);
-    finishPomodoro(evt);
+      $('#num-complete').text(numComplete);
+      $('#num-continue').text(numContinue);
+    });
   }
 
   var completeTask = function(evt) {
@@ -309,6 +281,7 @@ $(function() {
 
   var startBreak = function(durationInSec, evt) {
     evt.preventDefault();
+    pomodoro_ = new Object();
     startSession(durationInSec, 'break');
 
     var d = new Date();
@@ -430,7 +403,8 @@ $(function() {
   $('#finish-task-btns a:last-child').click(continueTomorrow);
   $('#finish-pomodoro').click(finishPomodoro);
   $('#tasks tfoot a').click(startPomodoro);
-  $('#break-short').click(function(evt) { startBreak(5 * 60, evt); });
+//  $('#break-short').click(function(evt) { startBreak(5 * 60, evt); });
+  $('#break-short').click(function(evt) { startBreak(3, evt); });
   $('#break-long').click(function(evt) { startBreak(20 * 60, evt); });
   $('#finish-break').click(stopBreak);
 

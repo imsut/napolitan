@@ -1,9 +1,6 @@
 <section>
-  <div class="page-header">
-    <h1>Today's Tasks
-
   <div class="row">
-    <form class="form-inline span8 offset2">
+    <form class="form-inline span10 offset2">
       <fieldset class="pull-right">
         <a id="sync-tasks" href="#modal-sync">
           <i class="icon-refresh">
@@ -21,8 +18,19 @@
       <h3>Synchronizing tasks with Asana...
       <p><img src="/static/img/ajax-loader.gif" title="synchronizing tasks..."/>
 
+  <div class="page-header">
+    <h1>
+      $maybe screenName <- mscreenName
+        #{screenName}'s Tasks for Today #
+      <small>Undone: #
+        <span id="num-undone">-
+        \ / Complete: #
+        <span id="num-complete">-
+        \ / Continue Tomorrow: #
+        <span id="num-continue">-
+
   <div class="row">
-    <table id="tasks" class="table table-striped span8 offset2">
+    <table id="tasks" class="table table-striped span10 offset1">
       <thead>
         <tr>
           <th>Task
@@ -82,20 +90,6 @@
   <audio id="audio-finish" preload="auto" autobuffer>
     <source src=@{StaticR audio_b_020_wav} type="audio/x-wav">
 
-<section>
-  <div class="page-header">
-    <h1>Finished Tasks
-
-  <div class="row">
-    <table id="finished-tasks" class="table table-striped span7 offset2">
-      <thead>
-        <tr>
-          <th>Task
-          <th>Status</th>
-      <tbody>
-        <tr>
-          <td>Added countdown timer
-          <td>Completed
-        <tr>
-          <td>Sync with Asana
-          <td>Continue Tomorrow
+<script>
+  $maybe screenName <- mscreenName
+    var screenName = "#{screenName}";

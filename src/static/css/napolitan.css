@@ -558,6 +558,7 @@ body section:first-child {
 }
 
 #tasks thead tr th {
+  text-align: center;
 }
 
 p.no-task {
@@ -594,13 +595,6 @@ p.no-task {
 }
 .the-icons i:hover {
   background-color: rgba(255,0,0,.25);
-}
-
-/* Eaxmples page
-------------------------- */
-.bootstrap-examples .thumbnail {
-  margin-bottom: 9px;
-  background-color: #fff;
 }
 
 /* Responsive table

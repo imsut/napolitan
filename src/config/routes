@@ -9,13 +9,15 @@
 /break       BreakR POST
 /task        TaskR POST
 
-/stats/#Text StatsR GET
+/stats/#Text 		StatsR GET
+/stats/#Text/#Text 	DailyStatsR GET
+
 /settings    SettingsR GET POST
 
 /signup      SignupR GET
 /signout     SignoutR GET
 
-/sync/asana/workspaces WorkspacesR GET
-/sync/asana/tasks/#Text             TasksR GET
+/sync/asana/workspaces 		WorkspacesR GET
+/sync/asana/tasks/#Text     TasksR GET
 
  -- /proxy/asana/#Text AsanaR GET

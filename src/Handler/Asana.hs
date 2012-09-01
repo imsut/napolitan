@@ -5,7 +5,6 @@ module Handler.Asana(getWorkspacesR
 
 import Import
 import Data.Aeson (toJSON)
-import qualified Data.Map as M
 import Data.Maybe
 import Data.Text (unpack)
 import Data.Time.Calendar (Day)

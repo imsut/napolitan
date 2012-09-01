@@ -4,6 +4,7 @@ User
     oauthToken Text Maybe
     oauthSecret Text Maybe
     UniqueUser twId
+    UniqueName twName
     deriving Show
 
 AsanaConfig
@@ -14,6 +15,7 @@ AsanaConfig
     deriving Show
 
 Pomodoro
+    userId UserId
     startOn Day
     startAt UTCTime
     endAt UTCTime
@@ -22,12 +24,14 @@ Pomodoro
     deriving Show
 
 Break
+    userId UserId
     startOn Day
     startAt UTCTime
     endAt UTCTime
     deriving Show
 
 FinishedTask
+    userId UserId
     finishOn Day
     finishAt UTCTime
     ident Text

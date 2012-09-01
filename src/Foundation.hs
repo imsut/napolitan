@@ -121,9 +121,7 @@ instance Yesod App where
             addStylesheet $ StaticR css_napolitan_css
             addScript $ StaticR js_jquery_js
             addScript $ StaticR js_jquery_ui_1_8_21_custom_min_js
-            addScript $ StaticR js_bootstrap_alert_js
-            addScript $ StaticR js_bootstrap_dropdown_js
-            addScript $ StaticR js_bootstrap_modal_js
+            addScript $ StaticR js_bootstrap_min_js
             $(widgetFile "default-layout")
         hamletToRepHtml $(hamletFile "templates/default-layout-wrapper.hamlet")
 
@@ -182,23 +180,25 @@ instance YesodAuth App where
     -- Where to send a user after logout
     logoutDest _ = HomeR
 
-    getAuthId creds = runDB $ do
+    getAuthId creds = do
       liftIO $ debugLog $ show $ credsExtra creds
       let userId = credsIdent creds
           extra = credsExtra creds
           screenName = fromJust $ lookup "screen_name" extra
           moaToken = lookup "oauth_token" extra
           moaSecret = lookup "oauth_token_secret" extra
-      x <- getBy $ UniqueUser userId
-      case x of
-        Just (Entity uid (User _ _ mtoken msecret)) ->
-          if mtoken == moaToken && msecret == moaSecret
-          then return $ Just uid
-          else do
-            update uid [UserOauthToken =. moaToken, UserOauthSecret =. moaSecret]
-            return $ Just uid
-        Nothing -> do
-          fmap Just $ insert $ User userId screenName moaToken moaSecret
+      setSession "screenName" screenName
+      runDB $ do
+        x <- getBy $ UniqueUser userId
+        case x of
+          Just (Entity uid (User _ _ mtoken msecret)) ->
+            if mtoken == moaToken && msecret == moaSecret
+            then return $ Just uid
+            else do
+              update uid [UserOauthToken =. moaToken, UserOauthSecret =. moaSecret]
+              return $ Just uid
+          Nothing -> do
+            fmap Just $ insert $ User userId screenName moaToken moaSecret
 
     authPlugins m = [authTwitter
                      ((encodeUtf8 . extraOauthKey . appExtra . settings) m)
@@ -206,7 +206,7 @@ instance YesodAuth App where
 
     authHttpManager = httpManager
 
-    -- override default behavior, setting login message
+    -- override default behavior not to set login message
     onLogin = return ()
 
 -- This instance is required to use forms. You can modify renderMessage to

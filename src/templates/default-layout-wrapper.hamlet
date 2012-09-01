@@ -36,6 +36,7 @@ $doctype 5
               <li class="divider-vertical">
               <li class=#{activeSettings}>
                 <a href=@{SettingsR}>Settings
+              <li class="divider-vertical">
               <li class="">
                 $maybe _ <- mauth
                   <a href=@{SignoutR}>Sign out
