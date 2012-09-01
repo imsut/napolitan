@@ -48,9 +48,9 @@ postSettingsR = do
           runDB $ do
             mrec <- getBy $ UniqueConfigByUserId aid
             case mrec of
-              Nothing -> insert $ AsanaConfig aid key $ fmap A.persist wks
+              Nothing -> insert $ AsanaConfig aid key wks
               Just (Entity eid _) -> do
-                update eid [ AsanaConfigApiKey =. key, AsanaConfigWorkspaces =. fmap A.persist wks ]
+                update eid [ AsanaConfigApiKey =. key, AsanaConfigWorkspaces =. wks ]
                 return eid
       redirect HomeR
     _ -> redirect SettingsR -- show form again

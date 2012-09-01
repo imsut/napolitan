@@ -50,11 +50,10 @@ getHomeR = do
       mrec <- runDB $ getBy $ UniqueConfigByUserId aid
       case mrec of
         Nothing -> redirect SettingsR -- need to set Asana API key
-        Just (Entity _ (AsanaConfig _ _ wks)) -> do
+        Just (Entity _ (AsanaConfig _ _ workspaces)) -> do
           mscreenName <- lookupSession "screenName"
           mworkspace <- lookupSession "workspaceId"
-          let workspaces = fmap unpersist wks
-              selectedWorkspace = fromMaybe "" mworkspace
+          let selectedWorkspace = fromMaybe "" mworkspace
           defaultLayout $ do
             setTitle "Pomodoro - Napolitan"
             $(widgetFile "pomodoro-js")

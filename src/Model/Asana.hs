@@ -1,9 +1,6 @@
 {-# LANGUAGE TupleSections, OverloadedStrings, FlexibleInstances, ImplicitPrelude #-}
 module Model.Asana (Workspace(..)
-                   , PersistWorkspace
                    , Task(..)
-                   , persist
-                   , unpersist
                    , getWorkspaces
                    , getTasks
                    , completeTask
@@ -17,9 +14,9 @@ import qualified Data.ByteString as S
 import Data.Maybe
 import Data.Text (Text, pack, unpack)
 import qualified Data.Text.Encoding as E
-import DebugUtil
+import Database.Persist
+import Database.Persist.Store
 import qualified Network.HTTP.Conduit as C
-import qualified Network.HTTP.Types as T
 
 urlWorkspaces :: String
 urlWorkspaces = "https://app.asana.com/api/1.0/workspaces"
@@ -31,13 +28,19 @@ urlTasks workspaceId = "https://app.asana.com/api/1.0/workspaces/"
   ++ "/tasks?assignee=me&opt_fields=assignee_status,name,due_on,projects,projects.name,completed"
 
 urlTask :: Text -> String
-urlTask taskId = "https://app.asana.com/api/1.0/tasks/" ++ unpack taskId
+urlTask t = "https://app.asana.com/api/1.0/tasks/" ++ unpack t
 
 data Workspace = Workspace { ident :: Text
                            , name :: Text
                            } deriving Show
 
-type PersistWorkspace = (Text, Text)
+instance PersistField Workspace where
+  toPersistValue (Workspace i n) = PersistMap [("id", PersistText i), ("name", PersistText n)]
+  fromPersistValue (PersistMap lst) = case (lookup "id" lst, lookup "name" lst) of
+    (Just (PersistText i), Just (PersistText n)) -> Right $ Workspace i n
+    _ -> Left $ pack ("failed to parse " ++ show lst)
+  fromPersistValue (PersistList ((PersistText i):(PersistText n):[])) = Right $ Workspace i n
+  sqlType _ = SqlString
 
 -- parse JSON and construct a list of AsanaWorkspace
 -- {"data":[{"id":42742032946,"name":"RevenueEng"},{"id":723538443138,"name":"Family / Personal"}]}
@@ -52,12 +55,6 @@ instance FromJSON [Workspace] where
 
 instance ToJSON Workspace where
   toJSON w = object $ [ "id" .= ident w, "name" .= name w ]
-
-persist :: Workspace -> PersistWorkspace
-persist (Workspace ident name) = (ident, name)
-
-unpersist :: PersistWorkspace -> Workspace
-unpersist (ident, name) = Workspace ident name
 
 data Task = Task { taskId :: Text
                  , taskName :: Text
