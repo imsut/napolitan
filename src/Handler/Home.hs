@@ -56,8 +56,8 @@ getHomeR = do
           let selectedWorkspace = fromMaybe "" mworkspace
           defaultLayout $ do
             setTitle "Pomodoro - Napolitan"
-            $(widgetFile "pomodoro-js")
             $(widgetFile "pomodoro")
+            $(widgetFile "pomodoro-js")
     Nothing -> defaultLayout $ do
       setTitle "Napolitan = Asana + Pomodoro"
       $(widgetFile "welcome")

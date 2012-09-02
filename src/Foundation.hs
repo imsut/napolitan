@@ -122,6 +122,7 @@ instance Yesod App where
             addScript $ StaticR js_jquery_js
             addScript $ StaticR js_jquery_ui_1_8_21_custom_min_js
             addScript $ StaticR js_bootstrap_min_js
+            addScript $ StaticR js_napolitan_js
             $(widgetFile "default-layout")
         hamletToRepHtml $(hamletFile "templates/default-layout-wrapper.hamlet")
 
