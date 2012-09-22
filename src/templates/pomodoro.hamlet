@@ -20,8 +20,7 @@
 
   <div class="page-header">
     <h1>
-      $maybe screenName <- mscreenName
-        #{screenName}'s Tasks for Today #
+      Today's Tasks #
       <small>Undone: #
         <span id="num-undone">-
         \ / Complete: #
@@ -89,7 +88,3 @@
 
   <audio id="audio-finish" preload="auto" autobuffer>
     <source src=@{StaticR audio_b_020_wav} type="audio/x-wav">
-
-<script>
-  $maybe screenName <- mscreenName
-    var screenName = "#{screenName}";

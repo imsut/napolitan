@@ -4,6 +4,7 @@ $(function() {
   var break_ = new Object();
   var timer_ = null;
   var titleBlinker_ = null;
+  var notification_ = null;
 
   var syncWithAsana = function(evt) {
     if (evt) evt.preventDefault();
@@ -110,6 +111,8 @@ $(function() {
     $('#finish-' + type).text('Abort');
     if (!pomodoro_.taskId) {
       $('#finish-task-btns').hide();
+    } else {
+      $('#finish-task-btns').show();
     }
     $('#modal-' + type).modal({ backdrop: 'static', keyboard: false });
 
@@ -136,11 +139,12 @@ $(function() {
 
       if (window.webkitNotifications &&
           window.webkitNotifications.checkPermission() == 0) { // 0 is PERMISSION_ALLOWED
-        notification = createNotificationInstance(type);
-        notification.onclick = function() {
-          notification.cancel();
+        notification_ = createNotificationInstance(type);
+        notification_.onclick = function() {
+          notification_.cancel();
+          notification_ = null;
         };
-        notification.show();
+        notification_.show();
       }
 
       // sound
@@ -167,6 +171,10 @@ $(function() {
     if (titleBlinker_) {
       titleBlinker_.stop();
       titleBlinker_ = null;
+    }
+    if (notification_) {
+      notification_.cancel();
+      notification_ = null;
     }
     $('#modal-' + type).modal('hide');
   }
@@ -242,7 +250,7 @@ $(function() {
 
   var updateFinishedTasks = function() {
     var today = new Date().toLocalDateInISO8601();
-    $.getJSON('/stats/' + screenName + '/' + today, function(data) {
+    $.getJSON('/stats/' + screenName + '/task?on=' + today, function(data) {
       var numComplete = 0;
       var numContinue = 0;
       $.each(data, function(idx, task) {
@@ -394,8 +402,8 @@ $(function() {
   $('#finish-task-btns a:last-child').click(continueTomorrow);
   $('#finish-pomodoro').click(finishPomodoro);
   $('#tasks tfoot a').click(startPomodoro);
-//  $('#break-short').click(function(evt) { startBreak(5 * 60, evt); });
-  $('#break-short').click(function(evt) { startBreak(3, evt); });
+  $('#break-short').click(function(evt) { startBreak(5 * 60, evt); });
+//  $('#break-short').click(function(evt) { startBreak(3, evt); });
   $('#break-long').click(function(evt) { startBreak(20 * 60, evt); });
   $('#finish-break').click(stopBreak);
 

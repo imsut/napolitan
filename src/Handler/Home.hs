@@ -51,7 +51,6 @@ getHomeR = do
       case mrec of
         Nothing -> redirect SettingsR -- need to set Asana API key
         Just (Entity _ (AsanaConfig _ _ workspaces)) -> do
-          mscreenName <- lookupSession "screenName"
           mworkspace <- lookupSession "workspaceId"
           let selectedWorkspace = fromMaybe "" mworkspace
           defaultLayout $ do

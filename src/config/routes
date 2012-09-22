@@ -9,8 +9,8 @@
 /break       BreakR POST
 /task        TaskR POST
 
-/stats/#Text 		StatsR GET
-/stats/#Text/#Text 	DailyStatsR GET
+/stats/#Text        StatsR GET
+/stats/#Text/#Text 	DataR GET
 
 /settings    SettingsR GET POST
 

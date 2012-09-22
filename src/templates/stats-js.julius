@@ -1,0 +1,185 @@
+$(function () {
+  $(document).ready(function() {
+    var chart = null;
+    var jsonData = null;
+    var type_ = $('#stats-type button.active').attr('data-type');
+    var unit_ = $('#stats-unit button.active').attr('data-unit');
+
+    var loadData = function() {
+      $.getJSON('/stats/' + screenName + '/' + type_, function(data) {
+        jsonData = data;
+        aggregateAndRender();
+      });
+    }
+
+    var createChart = function() {
+/*
+      var interval = 0;
+      switch (unit_) {
+      case "daily":
+        interval = 24 * 60 * 60 * 1000;
+        break;
+      case "weekly":
+        interval = 7 * 24 * 60 * 60 * 1000;
+        break;
+      case "monthly":
+        
+      }
+*/
+
+      return new Highcharts.Chart({
+        chart: {
+          renderTo: 'canvas',
+          type: 'column'
+        },
+        title: {
+          text: null
+        },
+        xAxis: {
+          type: 'datetime',
+/*
+          minRange: 24 * 60 * 60 * 1000,
+          tickInterval: 24 * 60 * 60 * 1000,
+*/
+        },
+        yAxis: {
+          allowDecimals: false,
+          min: 0,
+          title: {
+            text: 'Total fruit consumption'
+          },
+          stackLabels: {
+            enabled: true,
+            style: {
+                fontWeight: 'bold',
+                color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+            }
+          }
+        },
+        legend: {
+          enabled: false,
+        },
+        tooltip: {
+          formatter: function() {
+            return '<b>'+ new Date(this.x).toLocalDateInISO8601() +'</b><br/>'+
+                this.series.name +': '+ this.y +'<br/>'+
+                'Total: '+ this.point.stackTotal;
+          },
+          useHTML: true,
+        },
+        plotOptions: {
+          column: {
+            stacking: 'normal',
+            dataLabels: {
+              enabled: true,
+              color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'
+            },
+          }
+        },
+      });
+    }
+
+    var aggregateAndRender = function() {
+      // pomodoro/time -> { '2010-01-01': [ { startAt: X, endAt: Y, taskId: Z }, ... ], ... }
+      // task -> { '2010-01-01': [ { id: X, status: Y }, ... ], ... }
+
+      // pomodoro & daily -> by taskId
+      // pomodoro & weekly -> by taskId
+      // pomodoro & monthly -> one line
+      // time & daily -> by taskId
+      // time & weekly -> by taskId
+      // time & monthly -> one line
+      // task & _ -> complete or continue
+      
+      console.log("type = " + type_ + " / unit = " + unit_);
+
+      var allHashSeries = {};
+      var allDateKeys = {};
+      var dateKeyList = [];
+      $.each(jsonData, function(idx, entities) {
+        var dateKey;
+        var d = new Date(idx);
+        switch (unit_) {
+        case 'weekly':
+          var sunday = new Date(d.getTime() - d.getDay() * 24 * 60 * 60 * 1000);
+          dateKey = Date.UTC(sunday.getFullYear(), sunday.getMonth(), sunday.getDate());
+          break;
+        case 'monthly':
+          dateKey = Date.UTC(d.getFullYear(), d.getMonth(), 1);
+          break;
+        default:
+          dateKey = Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+          break;
+        }
+
+        if (!(dateKey in allDateKeys)) {
+          allDateKeys[dateKey] = 1;
+          dateKeyList.push(dateKey);
+        }
+
+        if (type_ == 'pomodoro' && unit_ != 'monthly') {
+          $.each(entities, function(_, entity) {
+            var date2value;
+            if ("taskId" in entity) {
+              var key = entity.taskId || "N/A";
+              date2value = allHashSeries[key];
+              if (!date2value) {
+                date2value = {};
+                allHashSeries[key] = date2value;
+              }
+
+              if (dateKey in date2value) {
+                date2value[dateKey]++;
+              } else {
+                date2value[dateKey] = 1;
+              }
+            }
+          });
+        }
+      });
+
+      // sort in numerical ascending order
+      dateKeyList.sort(function(a,b){ return a - b; });
+
+      var allListSeries = {};
+      $.each(allHashSeries, function(key, series) {
+        var lst = [];
+        for (var i = 0; i < dateKeyList.length; i++) {
+          var k = dateKeyList[i];
+          if (!(k in series)) continue;
+          lst.push([k, series[k]]);
+        }
+        allListSeries[key] = lst;
+      });
+
+      if (chart) {
+        chart.destroy();
+        chart = null;
+      }
+      chart = createChart();
+
+      $.each(allListSeries, function(key, series) {
+        chart.addSeries({
+          name: key,
+          data: series,
+        });
+      });
+    }
+
+    var typeButtonClicked = function(evt) {
+      type_ = $(evt.srcElement).attr('data-type');
+      loadData();
+    }
+
+    var unitButtonClicked = function(evt) {
+      unit_ = $(evt.srcElement).attr('data-unit');
+      aggregateAndRender();
+    }
+
+    $('#stats-type button').click(typeButtonClicked);
+    $('#stats-unit button').click(unitButtonClicked);
+
+    loadData();
+  });
+  
+});

@@ -13,6 +13,10 @@ $doctype 5
     \<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     \<![endif]-->
 
+    <script>
+      $maybe screenName <- muserName
+        var screenName = "#{screenName}";
+
   <body>
     \<!-- Navbar
     \================================================== -->

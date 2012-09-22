@@ -1,0 +1,20 @@
+<section>
+  <div class="page-header">
+    <h1>Stats #
+      <small>How many Pomodoros you have achieved thus far
+
+  <div class="row">
+    <div class="span10 offset1">
+      <div class="btn-toolbar pull-right">
+        <div id="stats-type" class="btn-group" data-toggle="buttons-radio">
+          <button class="btn active" data-type="pomodoro">Pomodoros
+          <button class="btn" data-type="task">Tasks
+          <button class="btn" data-type="time">Time
+
+        <div id="stats-unit" class="btn-group" data-toggle="buttons-radio">
+          <button class="btn active" data-unit="daily">Daily
+          <button class="btn" data-unit="weekly">Weekly
+          <button class="btn" data-unit="monthly">Monthly
+
+  <div class="row">
+    <div id="canvas" class="span10 offset1">
